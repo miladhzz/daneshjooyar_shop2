@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Base{% endblock %}</title>
+</head>
+<body>
+    {% block body %}
+        <p>test test test</p>
+    {% endblock %}
+    <hr />
+    <ul>
+        <li><a href="{% url 'website:index' %}">Website</a></li>
+        <li><a href="{% url 'shop:index' %}">Index</a></li>
+        <li><a href="{% url 'shop:store' %}">Store</a></li>
+        <li><a href="{% url 'shop:product' %}">Product</a></li>
+        <li><a href="{% url 'shop:checkout' %}">Checkout</a></li>
+    </ul>
+</body>
+</html>
