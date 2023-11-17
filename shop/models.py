@@ -5,6 +5,9 @@ from django.db import models
 class Category(models.Model):
     title = models.CharField(max_length=100)
 
+    def __str__(self):
+        return self.title
+
 
 class Product(models.Model):
     title = models.CharField(max_length=100)
@@ -14,7 +17,10 @@ class Product(models.Model):
     quantity = models.PositiveIntegerField()
     status = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
+    
+    def __str__(self):
+        return self.title
 
 
 class Cart(models.Model):
