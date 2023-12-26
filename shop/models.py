@@ -1,3 +1,4 @@
+from typing import Any
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -16,6 +17,10 @@ class BaseModel(models.Model):
 
     class Meta:
         abstract = True
+    
+    def delete(self, using=None, keep_parents=False):
+        self.deleted = True
+        self.save()
 
 
 class Category(BaseModel):
