@@ -1,7 +1,4 @@
-from typing import Any
 from django.contrib import admin
-from django.db.models.query import QuerySet
-from django.http.request import HttpRequest
 from . import models
 
 admin.site.register(models.Cart)
