@@ -15,7 +15,14 @@ def detail(request, id:int, title:str):
 
 
 def store(request):
-    return render(request, "store.html")
+    category = request.GET.get('category')
+
+    if category is not None:
+        products = Product.objects.filter(category__title=category)
+        return render(request, "store.html", {'products': products})
+
+    products = Product.objects.all()
+    return render(request, "store.html", {'products': products})
 
 
 def checkout(request):

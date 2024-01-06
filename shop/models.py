@@ -41,6 +41,11 @@ class Product(BaseModel):
     def __str__(self):
         return self.title
 
+    def get_absolute_url(self):
+        from django.urls import reverse
+
+        return reverse("shop:detail", kwargs={"id": self.id, "title": self.title})
+
 
 class Cart(BaseModel):
     quantity = models.PositiveIntegerField()
