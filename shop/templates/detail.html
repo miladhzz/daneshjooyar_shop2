@@ -98,15 +98,19 @@
 							</div>
 
 							<div class="add-to-cart">
+                                <form method="post">
 								<div class="qty-label">
 									Qty
 									<div class="input-number">
-										<input type="number">
+										<input type="number" name="quantity" value="1">
+                                        <input type="hidden" name="product_id" value="{{ product.id }}">
 										<span class="qty-up">+</span>
 										<span class="qty-down">-</span>
 									</div>
 								</div>
 								<button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> add to cart</button>
+                                {% csrf_token %}
+                                </form>
 							</div>
 
 							<ul class="product-btns">
