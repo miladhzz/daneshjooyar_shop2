@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Cart{% endblock title %}
+{% block content %}
+    <h1>Cart detail</h1>
+    <table>
+        <tr>
+            <th>product title</th>
+            <th>price</th>
+            <th>quantity</th>
+        </tr>
+        {% for key, values in cart.items %}
+        <tr>
+            <td>{{ values.product.title }}</td>
+            <td>{{ values.price }}</td>
+            <td>{{ values.quantity }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock content %}
