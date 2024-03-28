@@ -1,19 +1,34 @@
 {% extends "base.html" %}
 {% load static %}
 {% block title %}Cart{% endblock title %}
+{% block styles %}
+    <style>
+        th, td {
+            padding: 5px;
+            text-align: center;
+        }
+        table a {
+            text-decoration-line: underline;
+        }
+    </style>
+ {% endblock styles %}
 {% block content %}
     <h1>Cart detail</h1>
     <table>
         <tr>
+            <th>image</th>
             <th>product title</th>
             <th>price</th>
             <th>quantity</th>
+            <th>remove</th>
         </tr>
         {% for key, values in cart.items %}
         <tr>
-            <td>{{ values.product.title }}</td>
+            <td><img src="{{ values.product.image.url }}" alt="{{ values.product.title }}" width="150"/></td>
+            <td><a href="{{ values.product.get_absolute_url }}">{{ values.product.title }}</a></td>
             <td>{{ values.price }}</td>
             <td>{{ values.quantity }}</td>
+            <td><a href="{% url 'shop:remove_from_cart' values.product.id %}">Remove</a></td>
         </tr>
         {% endfor %}
     </table>
