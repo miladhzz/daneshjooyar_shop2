@@ -10,6 +10,18 @@
         table a {
             text-decoration-line: underline;
         }
+        .add-to-cart .qty-label .input-number {
+            width: 90px;
+            display: inline-block;
+        }
+        .add-to-cart .qty-label {
+            display: inline-block;
+            font-weight: 500;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-right: 15px;
+            margin-bottom: 0;
+        }
     </style>
  {% endblock styles %}
 {% block content %}
@@ -27,7 +39,24 @@
             <td><img src="{{ values.product.image.url }}" alt="{{ values.product.title }}" width="150"/></td>
             <td><a href="{{ values.product.get_absolute_url }}">{{ values.product.title }}</a></td>
             <td>{{ values.price }}</td>
-            <td>{{ values.quantity }}</td>
+            <td>
+                <div class="add-to-cart">
+                    <form method="post" action="{% url 'shop:add_to_cart' %}">
+                    <div class="qty-label">
+                        Qty
+                        <div class="input-number">
+                            <input type="number" name="quantity" value="{{ values.quantity }}">
+                            <input type="hidden" name="product_id" value="{{ values.product.id }}">
+                            <input type="hidden" name="update" value="1">
+                            <span class="qty-up">+</span>
+                            <span class="qty-down">-</span>
+                        </div>
+                    </div>
+                    <button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> Update</button>
+                    {% csrf_token %}
+                    </form>
+                </div>
+            </td>
             <td><a href="{% url 'shop:remove_from_cart' values.product.id %}">Remove</a></td>
         </tr>
         {% endfor %}

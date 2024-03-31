@@ -43,10 +43,17 @@ def add_to_cart(request):
     if not cart:
         cart = request.session['cart'] = {}
 
-    cart[product_id] = {
-        'quantity': int(quantity),
-        'price': str(product.price)
-    }
+    if product_id in cart:
+        update = request.POST.get('update')
+        if update == '1':
+            cart[product_id]['quantity'] = int(quantity)
+        else:
+            cart[product_id]['quantity'] += int(quantity)
+    else:
+        cart[product_id] = {
+            'quantity': int(quantity),
+            'price': str(product.price)
+        }
 
     request.session.modified = True
     return redirect(reverse('shop:cart_detail'))
