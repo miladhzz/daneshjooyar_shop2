@@ -32,6 +32,7 @@
             <th>product title</th>
             <th>price</th>
             <th>quantity</th>
+            <th>total price</th>
             <th>remove</th>
         </tr>
         {% for key, values in cart.items %}
@@ -57,6 +58,7 @@
                     </form>
                 </div>
             </td>
+            <td>{{ values.total_price }}</td>
             <td><a href="{% url 'shop:remove_from_cart' values.product.id %}">Remove</a></td>
         </tr>
         {% endfor %}
