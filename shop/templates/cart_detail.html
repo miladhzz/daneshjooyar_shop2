@@ -35,10 +35,10 @@
             <th>total price</th>
             <th>remove</th>
         </tr>
-        {% for key, values in cart.items %}
+        {% for item in cart %}
         <tr>
-            <td><img src="{{ values.product.image.url }}" alt="{{ values.product.title }}" width="150"/></td>
-            <td><a href="{{ values.product.get_absolute_url }}">{{ values.product.title }}</a></td>
+            <td><img src="{{ item.product.image.url }}" alt="{{ item.product.title }}" width="150"/></td>
+            <td><a href="{{ item.product.get_absolute_url }}">{{ item.product.title }}</a></td>
             <td>{{ values.price }}</td>
             <td>
                 <div class="add-to-cart">
@@ -46,8 +46,8 @@
                     <div class="qty-label">
                         Qty
                         <div class="input-number">
-                            <input type="number" name="quantity" value="{{ values.quantity }}">
-                            <input type="hidden" name="product_id" value="{{ values.product.id }}">
+                            <input type="number" name="quantity" value="{{ item.quantity }}">
+                            <input type="hidden" name="product_id" value="{{ item.product.id }}">
                             <input type="hidden" name="update" value="1">
                             <span class="qty-up">+</span>
                             <span class="qty-down">-</span>
@@ -58,8 +58,8 @@
                     </form>
                 </div>
             </td>
-            <td>{{ values.total_price }}</td>
-            <td><a href="{% url 'shop:remove_from_cart' values.product.id %}">Remove</a></td>
+            <td>{{ item.total_price }}</td>
+            <td><a href="{% url 'shop:remove_from_cart' item.product.id %}">Remove</a></td>
         </tr>
         {% endfor %}
     </table>
