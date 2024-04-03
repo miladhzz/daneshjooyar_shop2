@@ -1,7 +1,6 @@
 from django.http import Http404
 from django.shortcuts import render
 from django.views.decorators.http import require_POST
-from decimal import Decimal
 from .models import Product
 from django.shortcuts import get_object_or_404, redirect, reverse
 from .cart import Cart
@@ -48,18 +47,6 @@ def add_to_cart(request):
 
 
 def cart_detail(request):
-    cart = Cart(request)
-    if cart:
-        product_ids = cart.product_ids
-        products = Product.objects.filter(id__in=product_ids)
-        for product in products:
-            cart[str(product.id)]['product'] = product
-
-        for item in cart:
-            item['total_price'] = Decimal(item['price']) * item['quantity']
-
-        return render(request, 'cart_detail.html', {'cart': cart})
-
     return render(request, 'cart_detail.html')
 
 

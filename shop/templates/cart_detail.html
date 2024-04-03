@@ -39,7 +39,7 @@
         <tr>
             <td><img src="{{ item.product.image.url }}" alt="{{ item.product.title }}" width="150"/></td>
             <td><a href="{{ item.product.get_absolute_url }}">{{ item.product.title }}</a></td>
-            <td>{{ values.price }}</td>
+            <td>{{ item.price }}</td>
             <td>
                 <div class="add-to-cart">
                     <form method="post" action="{% url 'shop:add_to_cart' %}">
