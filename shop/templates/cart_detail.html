@@ -7,7 +7,7 @@
             padding: 5px;
             text-align: center;
         }
-        table a {
+        table a , a.shopping{
             text-decoration-line: underline;
         }
         .add-to-cart .qty-label .input-number {
@@ -25,42 +25,46 @@
     </style>
  {% endblock styles %}
 {% block content %}
-    <h1>Cart detail</h1>
-    <table>
-        <tr>
-            <th>image</th>
-            <th>product title</th>
-            <th>price</th>
-            <th>quantity</th>
-            <th>total price</th>
-            <th>remove</th>
-        </tr>
-        {% for item in cart %}
-        <tr>
-            <td><img src="{{ item.product.image.url }}" alt="{{ item.product.title }}" width="150"/></td>
-            <td><a href="{{ item.product.get_absolute_url }}">{{ item.product.title }}</a></td>
-            <td>{{ item.price }}</td>
-            <td>
-                <div class="add-to-cart">
-                    <form method="post" action="{% url 'shop:add_to_cart' %}">
-                    <div class="qty-label">
-                        Qty
-                        <div class="input-number">
-                            <input type="number" name="quantity" value="{{ item.quantity }}">
-                            <input type="hidden" name="product_id" value="{{ item.product.id }}">
-                            <input type="hidden" name="update" value="1">
-                            <span class="qty-up">+</span>
-                            <span class="qty-down">-</span>
+    <div class="container">
+        <h1>Cart detail</h1>
+        <table>
+            <tr>
+                <th>image</th>
+                <th>product title</th>
+                <th>price</th>
+                <th>quantity</th>
+                <th>total price</th>
+                <th>remove</th>
+            </tr>
+            {% for item in cart %}
+            <tr>
+                <td><img src="{{ item.product.image.url }}" alt="{{ item.product.title }}" width="150"/></td>
+                <td><a href="{{ item.product.get_absolute_url }}">{{ item.product.title }}</a></td>
+                <td>{{ item.price }}</td>
+                <td>
+                    <div class="add-to-cart">
+                        <form method="post" action="{% url 'shop:add_to_cart' %}">
+                        <div class="qty-label">
+                            Qty
+                            <div class="input-number">
+                                <input type="number" name="quantity" value="{{ item.quantity }}">
+                                <input type="hidden" name="product_id" value="{{ item.product.id }}">
+                                <input type="hidden" name="update" value="1">
+                                <span class="qty-up">+</span>
+                                <span class="qty-down">-</span>
+                            </div>
                         </div>
+                        <button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> Update</button>
+                        {% csrf_token %}
+                        </form>
                     </div>
-                    <button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> Update</button>
-                    {% csrf_token %}
-                    </form>
-                </div>
-            </td>
-            <td>{{ item.total_price }}</td>
-            <td><a href="{% url 'shop:remove_from_cart' item.product.id %}">Remove</a></td>
-        </tr>
-        {% endfor %}
-    </table>
+                </td>
+                <td>{{ item.total_price }}</td>
+                <td><a href="{% url 'shop:remove_from_cart' item.product.id %}">Remove</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+        <a href="{% url 'shop:checkout' %}" class="primary-btn order-submit">Checkout</a>
+        <a href="{% url 'shop:store' %}" class="shopping">Continue Shopping</a>
+    </div>
 {% endblock content %}
