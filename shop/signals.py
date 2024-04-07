@@ -1,7 +1,7 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .models import Product, Cart, OrderProduct, Order
-from accounts.models import User
+from accounts.models import User, Profile
 
 
 @receiver(post_save, sender=Product)
@@ -48,6 +48,10 @@ def soft_delete_order(sender, instance, created, **kwargs):
     if not created:
         user: User = instance
         if user.deleted:
+            try:
+                Profile.objects.get(user=user).delete()
+            except Profile.DoesNotExist:
+                pass
             orders = Order.objects.filter(user=user)
             for order in orders:
                 order.delete()
