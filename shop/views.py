@@ -5,6 +5,7 @@ from django.views.decorators.http import require_POST
 from .models import Product, Order, OrderProduct
 from django.shortcuts import get_object_or_404, redirect, reverse
 from .cart import Cart
+from accounts.models import Profile
 
 
 def index(request):
@@ -31,6 +32,10 @@ def store(request):
 
 @login_required
 def checkout(request):
+    try:
+        Profile.objects.get(user=request.user)
+    except Profile.DoesNotExist:
+        return redirect(reverse('accounts:edit_profile') + '?next=' + reverse('shop:checkout'))
     cart = Cart(request)
     if request.method == 'POST':
         order = Order.objects.create(user=request.user, total_price=cart.get_total_price)

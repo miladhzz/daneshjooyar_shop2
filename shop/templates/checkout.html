@@ -1,6 +1,13 @@
 {% extends "base.html" %}
 {% load static %}
 {% block title %}Checkout{% endblock title %}
+{% block styles %}
+    <style>
+    a.edit {
+        text-decoration-line: underline;
+    }
+    </style>
+{% endblock styles %}
 {% block content %}
 		<!-- BREADCRUMB -->
 		<div id="breadcrumb" class="section">
@@ -36,42 +43,30 @@
 								<h3 class="title">Billing address</h3>
 							</div>
 							<div class="form-group">
-								<input class="input" type="text" name="first-name" placeholder="First Name">
+								First Name: {{ request.user.first_name }}
 							</div>
 							<div class="form-group">
-								<input class="input" type="text" name="last-name" placeholder="Last Name">
+								Last Name: {{ request.user.last_name }}
 							</div>
 							<div class="form-group">
-								<input class="input" type="email" name="email" placeholder="Email">
+								Email: {{ request.user.last_name }}
+							</div>
+                            <div class="form-group">
+								Province: {{ request.user.profile.city.province }}
 							</div>
 							<div class="form-group">
-								<input class="input" type="text" name="address" placeholder="Address">
+								City: {{ request.user.profile.city }}
 							</div>
 							<div class="form-group">
-								<input class="input" type="text" name="city" placeholder="City">
+								Postal Code:{{ request.user.profile.postal_code }}
 							</div>
 							<div class="form-group">
-								<input class="input" type="text" name="country" placeholder="Country">
+								Mobile: {{ request.user.mobile }}
 							</div>
-							<div class="form-group">
-								<input class="input" type="text" name="zip-code" placeholder="ZIP Code">
+                            <div class="form-group">
+								Address: {{ request.user.profile.address }}
 							</div>
-							<div class="form-group">
-								<input class="input" type="tel" name="tel" placeholder="Telephone">
-							</div>
-							<div class="form-group">
-								<div class="input-checkbox">
-									<input type="checkbox" id="create-account">
-									<label for="create-account">
-										<span></span>
-										Create Account?
-									</label>
-									<div class="caption">
-										<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt.</p>
-										<input class="input" type="password" name="password" placeholder="Enter Your Password">
-									</div>
-								</div>
-							</div>
+                            <a href="{% url 'accounts:edit_profile' %}?next={% url 'shop:checkout' %}" class="edit">Edit</a>
 						</div>
 						<!-- /Billing Details -->
 
@@ -116,11 +111,6 @@
 						</div>
 						<!-- /Shiping Details -->
 
-						<!-- Order notes -->
-						<div class="order-notes">
-							<textarea class="input" placeholder="Order Notes"></textarea>
-						</div>
-						<!-- /Order notes -->
 					</div>
 
 					<!-- Order Details -->
@@ -150,47 +140,13 @@
 								<div><strong class="order-total">${{ cart.get_total_price }}</strong></div>
 							</div>
 						</div>
-						<div class="payment-method">
-							<div class="input-radio">
-								<input type="radio" name="payment" id="payment-1">
-								<label for="payment-1">
-									<span></span>
-									Direct Bank Transfer
-								</label>
-								<div class="caption">
-									<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-								</div>
-							</div>
-							<div class="input-radio">
-								<input type="radio" name="payment" id="payment-2">
-								<label for="payment-2">
-									<span></span>
-									Cheque Payment
-								</label>
-								<div class="caption">
-									<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-								</div>
-							</div>
-							<div class="input-radio">
-								<input type="radio" name="payment" id="payment-3">
-								<label for="payment-3">
-									<span></span>
-									Paypal System
-								</label>
-								<div class="caption">
-									<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-								</div>
-							</div>
-						</div>
-						<div class="input-checkbox">
-							<input type="checkbox" id="terms">
-							<label for="terms">
-								<span></span>
-								I've read and accept the <a href="#">terms & conditions</a>
-							</label>
-						</div>
                         <form method="post">
                             {% csrf_token %}
+                            <!-- Order notes -->
+                            <div class="order-notes">
+                                <textarea class="input" placeholder="Order Notes"></textarea>
+                            </div>
+                            <!-- /Order notes -->
 						    <input type="submit" class="primary-btn order-submit" value="Place Order">
                         </form>
 					</div>
