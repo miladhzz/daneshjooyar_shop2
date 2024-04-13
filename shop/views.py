@@ -6,6 +6,7 @@ from .models import Product, Order, OrderProduct
 from django.shortcuts import get_object_or_404, redirect, reverse
 from .cart import Cart
 from accounts.models import Profile
+from .forms import OrderForm
 
 
 def index(request):
@@ -36,17 +37,64 @@ def checkout(request):
         Profile.objects.get(user=request.user)
     except Profile.DoesNotExist:
         return redirect(reverse('accounts:edit_profile') + '?next=' + reverse('shop:checkout'))
+
     cart = Cart(request)
     if request.method == 'POST':
-        order = Order.objects.create(user=request.user, total_price=cart.get_total_price)
-        for item in cart:
-            OrderProduct.objects.create(order=order,
-                                        product_id=item['product_id'],
-                                        quantity=item['quantity'],
-                                        price=item['price'])
+        different_address = request.POST.get('different_address')
+
+        if different_address:
+            order_form = OrderForm(request.POST)
+            if not order_form.is_valid():
+                return render(request, "checkout.html")
+            order = save_order_different(cart, order_form, request)
+            cart.clear()
+            return render(request, "order_detail.html", {'order': order})
+
+        # not different_address:
+        order = save_order_user(cart, request)
         cart.clear()
         return render(request, "order_detail.html", {'order': order})
     return render(request, "checkout.html")
+
+
+def save_order_user(cart, request):
+    order = Order.objects.create(
+        user=request.user,
+        total_price=cart.get_total_price,
+        note=request.POST.get('note'),
+        different_address=False,
+        first_name=request.user.first_name,
+        last_name=request.user.last_name,
+        mobile=request.user.mobile,
+        postal_code=request.user.profile.postal_code,
+        address=request.user.profile.address,
+    )
+    for item in cart:
+        OrderProduct.objects.create(order=order,
+                                    product_id=item['product_id'],
+                                    quantity=item['quantity'],
+                                    price=item['price'])
+    return order
+
+
+def save_order_different(cart, order_form, request):
+    order = Order.objects.create(
+        user=request.user,
+        total_price=cart.get_total_price,
+        note=request.POST.get('note'),
+        different_address=True,
+        first_name=order_form.cleaned_data['first_name'],
+        last_name=order_form.cleaned_data['last_name'],
+        mobile=order_form.cleaned_data['mobile'],
+        postal_code=order_form.cleaned_data['postal_code'],
+        address=order_form.cleaned_data['address'],
+    )
+    for item in cart:
+        OrderProduct.objects.create(order=order,
+                                    product_id=item['product_id'],
+                                    quantity=item['quantity'],
+                                    price=item['price'])
+    return order
 
 
 @require_POST

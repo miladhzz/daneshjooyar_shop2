@@ -69,48 +69,6 @@
                             <a href="{% url 'accounts:edit_profile' %}?next={% url 'shop:checkout' %}" class="edit">Edit</a>
 						</div>
 						<!-- /Billing Details -->
-
-						<!-- Shiping Details -->
-						<div class="shiping-details">
-							<div class="section-title">
-								<h3 class="title">Shiping address</h3>
-							</div>
-							<div class="input-checkbox">
-								<input type="checkbox" id="shiping-address">
-								<label for="shiping-address">
-									<span></span>
-									Ship to a diffrent address?
-								</label>
-								<div class="caption">
-									<div class="form-group">
-										<input class="input" type="text" name="first-name" placeholder="First Name">
-									</div>
-									<div class="form-group">
-										<input class="input" type="text" name="last-name" placeholder="Last Name">
-									</div>
-									<div class="form-group">
-										<input class="input" type="email" name="email" placeholder="Email">
-									</div>
-									<div class="form-group">
-										<input class="input" type="text" name="address" placeholder="Address">
-									</div>
-									<div class="form-group">
-										<input class="input" type="text" name="city" placeholder="City">
-									</div>
-									<div class="form-group">
-										<input class="input" type="text" name="country" placeholder="Country">
-									</div>
-									<div class="form-group">
-										<input class="input" type="text" name="zip-code" placeholder="ZIP Code">
-									</div>
-									<div class="form-group">
-										<input class="input" type="tel" name="tel" placeholder="Telephone">
-									</div>
-								</div>
-							</div>
-						</div>
-						<!-- /Shiping Details -->
-
 					</div>
 
 					<!-- Order Details -->
@@ -141,10 +99,47 @@
 							</div>
 						</div>
                         <form method="post">
+                            <!-- Shiping Details -->
+                            <div class="shiping-details">
+                                <div class="input-checkbox">
+                                    <input type="checkbox" name="different_address" id="shiping-address">
+                                    <label for="shiping-address">
+                                        <span></span>
+                                        Ship to a diffrent address?
+                                    </label>
+                                    <div class="caption">
+                                        <div class="section-title">
+                                            <h3 class="title">Shiping address</h3>
+                                        </div>
+                                        <div class="form-group">
+                                            <input class="input" type="text" name="first_name" placeholder="First Name">
+                                        </div>
+                                        <div class="form-group">
+                                            <input class="input" type="text" name="last_name" placeholder="Last Name">
+                                        </div>
+                                        <div class="form-group">
+                                            <input class="input" type="text" name="province" placeholder="Province">
+                                        </div>
+                                        <div class="form-group">
+                                            <input class="input" type="text" name="city" placeholder="City">
+                                        </div>
+                                        <div class="form-group">
+                                            <input class="input" type="text" name="postal_code" placeholder="postal_code">
+                                        </div>
+                                        <div class="form-group">
+                                            <input class="input" type="tel" name="mobile" placeholder="Mobile">
+                                        </div>
+                                        <div class="form-group">
+                                            <input class="input" type="text" name="address" placeholder="Address">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /Shiping Details -->
                             {% csrf_token %}
                             <!-- Order notes -->
                             <div class="order-notes">
-                                <textarea class="input" placeholder="Order Notes"></textarea>
+                                <textarea class="input" name="note" placeholder="Order Notes"></textarea>
                             </div>
                             <!-- /Order notes -->
 						    <input type="submit" class="primary-btn order-submit" value="Place Order">
@@ -158,3 +153,28 @@
 		</div>
 		<!-- /SECTION -->
 {% endblock content %}
+{% block scripts %}
+    <script>
+        $(document).ready(function() {
+            $('#shiping-address').change(function(){
+               if ($(this).is(':checked')){
+                   $('input[name="first_name"]').prop('required', true);
+                   $('input[name="last_name"]').prop('required', true);
+                   $('input[name="province"]').prop('required', true);
+                   $('input[name="city"]').prop('required', true);
+                   $('input[name="postal_code"]').prop('required', true);
+                   $('input[name="mobile"]').prop('required', true);
+                   $('input[name="address"]').prop('required', true);
+               } else {
+                   $('input[name="first_name"]').removeAttr('required');
+                   $('input[name="last_name"]').removeAttr('required');
+                   $('input[name="province"]').removeAttr('required');
+                   $('input[name="city"]').removeAttr('required');
+                   $('input[name="postal_code"]').removeAttr('required');
+                   $('input[name="mobile"]').removeAttr('required');
+                   $('input[name="address"]').removeAttr('required');
+               }
+            });
+        });
+    </script>
+{% endblock scripts %}
