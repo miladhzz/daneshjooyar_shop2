@@ -118,10 +118,20 @@
                                             <input class="input" type="text" name="last_name" placeholder="Last Name">
                                         </div>
                                         <div class="form-group">
-                                            <input class="input" type="text" name="province" placeholder="Province">
+                                            <select class="input" name="province" id="province">
+                                                <option value="">Select Province....</option>
+                                                {% for item in provinces %}
+                                                    <option value="{{ item.id }}">{{ item.title }}</option>
+                                                {% endfor %}
+                                            </select>
                                         </div>
                                         <div class="form-group">
-                                            <input class="input" type="text" name="city" placeholder="City">
+                                            <select class="input" name="city" id="city">
+                                                <option value="">Select City....</option>
+                                                {% for item in cities %}
+                                                    <option value="{{ item.id }}">{{ item.title }}</option>
+                                                {% endfor %}
+                                            </select>
                                         </div>
                                         <div class="form-group">
                                             <input class="input" type="text" name="postal_code" placeholder="postal_code">
@@ -165,6 +175,8 @@
                    $('input[name="postal_code"]').prop('required', true);
                    $('input[name="mobile"]').prop('required', true);
                    $('input[name="address"]').prop('required', true);
+                   $('select[name="province"]').prop('required', true);
+                   $('select[name="city"]').prop('required', true);
                } else {
                    $('input[name="first_name"]').removeAttr('required');
                    $('input[name="last_name"]').removeAttr('required');
@@ -173,7 +185,14 @@
                    $('input[name="postal_code"]').removeAttr('required');
                    $('input[name="mobile"]').removeAttr('required');
                    $('input[name="address"]').removeAttr('required');
+                   $('select[name="province"]').removeAttr('required');
+                   $('select[name="city"]').removeAttr('required');
                }
+            });
+
+            //
+            $('#province').change(function(){
+                console.log($(this).val());
             });
         });
     </script>

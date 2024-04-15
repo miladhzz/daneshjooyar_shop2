@@ -5,7 +5,7 @@ from django.views.decorators.http import require_POST
 from .models import Product, Order, OrderProduct
 from django.shortcuts import get_object_or_404, redirect, reverse
 from .cart import Cart
-from accounts.models import Profile
+from accounts.models import Profile, Province, City
 from .forms import OrderForm
 
 
@@ -54,7 +54,12 @@ def checkout(request):
         order = save_order_user(cart, request)
         cart.clear()
         return render(request, "order_detail.html", {'order': order})
-    return render(request, "checkout.html")
+
+    context = {
+        'provinces': Province.objects.all(),
+        'cities': City.objects.all(),
+    }
+    return render(request, "checkout.html", context=context)
 
 
 def save_order_user(cart, request):
