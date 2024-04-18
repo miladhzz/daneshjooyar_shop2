@@ -128,9 +128,6 @@
                                         <div class="form-group">
                                             <select class="input" name="city" id="city">
                                                 <option value="">Select City....</option>
-                                                {% for item in cities %}
-                                                    <option value="{{ item.id }}">{{ item.title }}</option>
-                                                {% endfor %}
                                             </select>
                                         </div>
                                         <div class="form-group">
@@ -192,7 +189,23 @@
 
             //
             $('#province').change(function(){
-                console.log($(this).val());
+                $('#city').empty();
+                $('#city').append('<option value="">Select City....</option>');
+
+                let province_id = $(this).val();
+
+                $.ajax({
+                    url: "http://127.0.0.1:8000/accounts/get-cities/",
+                    dataType: "json",
+                    data: {
+                        'province_id': province_id
+                    },
+                    success: function(data){
+                        $.map(data, function(item){
+                            $('#city').append('<option value="'+ item.id +'">'+ item.title +'</option>');
+                        });
+                    }
+                });
             });
         });
     </script>

@@ -56,8 +56,7 @@ def checkout(request):
         return render(request, "order_detail.html", {'order': order})
 
     context = {
-        'provinces': Province.objects.all(),
-        'cities': City.objects.all(),
+        'provinces': Province.objects.all()
     }
     return render(request, "checkout.html", context=context)
 
@@ -73,6 +72,7 @@ def save_order_user(cart, request):
         mobile=request.user.mobile,
         postal_code=request.user.profile.postal_code,
         address=request.user.profile.address,
+        city_id=request.user.profile.city_id,
     )
     for item in cart:
         OrderProduct.objects.create(order=order,
@@ -93,6 +93,7 @@ def save_order_different(cart, order_form, request):
         mobile=order_form.cleaned_data['mobile'],
         postal_code=order_form.cleaned_data['postal_code'],
         address=order_form.cleaned_data['address'],
+        city_id=order_form.cleaned_data['city'],
     )
     for item in cart:
         OrderProduct.objects.create(order=order,

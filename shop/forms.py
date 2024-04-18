@@ -7,3 +7,4 @@ class OrderForm(forms.Form):
     mobile = forms.CharField(max_length=11)
     address = forms.CharField(max_length=500)
     postal_code = forms.CharField(max_length=10)
+    city = forms.IntegerField()
