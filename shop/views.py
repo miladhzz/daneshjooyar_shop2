@@ -112,7 +112,7 @@ def add_to_cart(request):
     product = get_object_or_404(Product, id=product_id)
 
     cart = Cart(request)
-    cart.add(product_id, str(product.price), int(quantity), update)
+    cart.add(product_id, product.price, int(quantity), update)
 
     return redirect(reverse('shop:cart_detail'))
 

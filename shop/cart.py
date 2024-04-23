@@ -20,7 +20,7 @@ class Cart:
 
     @property
     def get_total_price(self):
-        return sum(Decimal(item['price']) * item['quantity'] for item in self.cart.values())
+        return sum(int(item['price']) * item['quantity'] for item in self.cart.values())
 
     def __getitem__(self, item):
         return self.cart[item]

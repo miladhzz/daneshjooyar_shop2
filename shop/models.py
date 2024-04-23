@@ -33,7 +33,7 @@ class Category(BaseModel):
 class Product(BaseModel):
     title = models.CharField(max_length=100)
     content = models.TextField()
-    price = models.DecimalField(decimal_places=2, max_digits=10)
+    price = models.IntegerField()
     image = models.ImageField(upload_to='image/products')
     quantity = models.PositiveIntegerField()
     status = models.BooleanField(default=True)
@@ -55,7 +55,7 @@ class Cart(BaseModel):
 
 
 class Order(BaseModel):
-    total_price = models.DecimalField(decimal_places=2, max_digits=10)
+    total_price = models.IntegerField()
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     status = models.BooleanField(null=True)
     note = models.CharField(max_length=200, blank=True)
@@ -72,11 +72,11 @@ class OrderProduct(BaseModel):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
-    price = models.DecimalField(decimal_places=2, max_digits=10)
+    price = models.IntegerField()
 
 
 class PaymentLog(models.Model):
-    amount = models.DecimalField(decimal_places=2, max_digits=10)
+    amount = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     user_id = models.PositiveIntegerField()
     order_id = models.PositiveIntegerField()
