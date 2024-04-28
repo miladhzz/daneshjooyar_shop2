@@ -5,8 +5,11 @@ from django.views.decorators.http import require_POST
 from .models import Product, Order, OrderProduct
 from django.shortcuts import get_object_or_404, redirect, reverse
 from .cart import Cart
-from accounts.models import Profile, Province, City
+from accounts.models import Profile, Province
 from .forms import OrderForm
+from django.conf import settings
+import json
+import requests
 
 
 def index(request):
@@ -48,17 +51,46 @@ def checkout(request):
                 return render(request, "checkout.html")
             order = save_order_different(cart, order_form, request)
             cart.clear()
-            return render(request, "order_detail.html", {'order': order})
+            return redirect(reverse('shop:to_bank', args=[order.id]))
 
         # not different_address:
         order = save_order_user(cart, request)
         cart.clear()
-        return render(request, "order_detail.html", {'order': order})
+        return redirect(reverse('shop:to_bank', args=[order.id]))
 
     context = {
         'provinces': Province.objects.all()
     }
     return render(request, "checkout.html", context=context)
+
+
+def to_bank(request, order_id):
+    order = get_object_or_404(Order, id=order_id, status__isnull=True)
+    data = {
+        "MerchantID": settings.ZARINPAL_MERCHANT_ID,
+        "Amount": order.total_price,
+        "Description": f'sandbox, order: {order.id}',
+        "CallbackURL": settings.ZARINPAL_CALLBACK_URL,
+    }
+    data = json.dumps(data)
+    headers = {'content-type': 'application/json', 'content-length': str(len(data))}
+
+    try:
+        response = requests.post(settings.ZARINPAL_REQUEST, data=data, headers=headers, timeout=10)
+
+        if response.status_code == 200:
+            response = response.json()
+            if response['Status'] == 100:
+                authority = response['Authority']
+                return redirect(settings.ZARINPAL_STARTPAY + authority)
+            else:
+                return render(request, 'to_bank.html', {'error': f'status error code: {response["Status"]}'})
+        return render(request, 'to_bank.html', {'error': f'response status code: {response.status_code}'})
+
+    except requests.exceptions.Timeout:
+        return render(request, 'to_bank.html', {'error': 'time out error'})
+    except requests.exceptions.ConnectionError:
+        return render(request, 'to_bank.html', {'error': 'connection error'})
 
 
 def save_order_user(cart, request):
