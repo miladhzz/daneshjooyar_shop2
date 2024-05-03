@@ -82,6 +82,8 @@ def to_bank(request, order_id):
             response = response.json()
             if response['Status'] == 100:
                 authority = response['Authority']
+                order.zarinpal_authority = authority
+                order.save()
                 return redirect(settings.ZARINPAL_STARTPAY + authority)
             else:
                 return render(request, 'to_bank.html', {'error': f'status error code: {response["Status"]}'})
@@ -91,6 +93,16 @@ def to_bank(request, order_id):
         return render(request, 'to_bank.html', {'error': 'time out error'})
     except requests.exceptions.ConnectionError:
         return render(request, 'to_bank.html', {'error': 'connection error'})
+
+
+def verify(request):
+    authority = request.GET.get('Authority')
+    status = request.GET.get('Status')
+
+    if status and status == 'OK':
+        order = get_object_or_404(Order, zarinpal_authority=authority)
+        print('order', order.id)
+    return render(request, 'verify.html')
 
 
 def save_order_user(cart, request):
