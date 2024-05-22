@@ -64,8 +64,9 @@ def checkout(request):
     return render(request, "checkout.html", context=context)
 
 
+@login_required
 def to_bank(request, order_id):
-    order = get_object_or_404(Order, id=order_id, status__isnull=True)
+    order = get_object_or_404(Order, id=order_id, user_id=request.user.id, status__isnull=True)
     data = {
         "MerchantID": settings.ZARINPAL_MERCHANT_ID,
         "Amount": order.total_price,
@@ -83,6 +84,7 @@ def to_bank(request, order_id):
             if response['Status'] == 100:
                 authority = response['Authority']
                 order.zarinpal_authority = authority
+                order.status = False
                 order.save()
                 return redirect(settings.ZARINPAL_STARTPAY + authority)
             else:
@@ -101,7 +103,33 @@ def verify(request):
 
     if status and status == 'OK':
         order = get_object_or_404(Order, zarinpal_authority=authority)
-        print('order', order.id)
+        data = {
+            "MerchantID": settings.ZARINPAL_MERCHANT_ID,
+            "Amount": order.total_price,
+            "Authority": order.zarinpal_authority,
+        }
+        data = json.dumps(data)
+        headers = {'content-type': 'application/json', 'content-length': str(len(data))}
+
+        try:
+            response = requests.post(settings.ZARINPAL_VERIFY, data=data, headers=headers, timeout=10)
+
+            if response.status_code == 200:
+                response = response.json()
+                if response['Status'] == 100:
+                    ref_id = response['RefID']
+                    order.zarinpal_ref_id = ref_id
+                    order.status = True
+                    order.save()
+                    return render(request, 'verify.html', {'ref_id': ref_id})
+                else:
+                    return render(request, 'verify.html', {'error': f'status error code: {response["Status"]}'})
+            return render(request, 'verify.html', {'error': f'response status code: {response.status_code}'})
+
+        except requests.exceptions.Timeout:
+            return render(request, 'verify.html', {'error': 'time out error'})
+        except requests.exceptions.ConnectionError:
+            return render(request, 'verify.html', {'error': 'connection error'})
     return render(request, 'verify.html')
 
 

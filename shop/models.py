@@ -67,6 +67,7 @@ class Order(BaseModel):
     city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True)
     postal_code = models.CharField(max_length=10)
     zarinpal_authority = models.CharField(max_length=50, null=True)
+    zarinpal_ref_id = models.IntegerField(null=True)
 
 
 class OrderProduct(BaseModel):
