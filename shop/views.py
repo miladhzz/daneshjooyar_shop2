@@ -78,59 +78,61 @@ def to_bank(request, order_id):
 
     try:
         response = requests.post(settings.ZARINPAL_REQUEST, data=data, headers=headers, timeout=10)
-
-        if response.status_code == 200:
-            response = response.json()
-            if response['Status'] == 100:
-                authority = response['Authority']
-                order.zarinpal_authority = authority
-                order.status = False
-                order.save()
-                return redirect(settings.ZARINPAL_STARTPAY + authority)
-            else:
-                return render(request, 'to_bank.html', {'error': f'status error code: {response["Status"]}'})
-        return render(request, 'to_bank.html', {'error': f'response status code: {response.status_code}'})
-
     except requests.exceptions.Timeout:
         return render(request, 'to_bank.html', {'error': 'time out error'})
     except requests.exceptions.ConnectionError:
         return render(request, 'to_bank.html', {'error': 'connection error'})
+
+    if response.status_code != 200:
+        return render(request, 'to_bank.html', {'error': f'response status code: {response.status_code}'})
+
+    response = response.json()
+    if response['Status'] != 100:
+        return render(request, 'to_bank.html', {'error': f'status error code: {response["Status"]}'})
+
+    authority = response['Authority']
+    order.zarinpal_authority = authority
+    order.status = False
+    order.save()
+    return redirect(settings.ZARINPAL_STARTPAY + authority)
 
 
 def verify(request):
     authority = request.GET.get('Authority')
     status = request.GET.get('Status')
 
-    if status and status == 'OK':
-        order = get_object_or_404(Order, zarinpal_authority=authority)
-        data = {
-            "MerchantID": settings.ZARINPAL_MERCHANT_ID,
-            "Amount": order.total_price,
-            "Authority": order.zarinpal_authority,
-        }
-        data = json.dumps(data)
-        headers = {'content-type': 'application/json', 'content-length': str(len(data))}
+    if not status or status != 'OK':
+        return render(request, 'verify.html')
 
-        try:
-            response = requests.post(settings.ZARINPAL_VERIFY, data=data, headers=headers, timeout=10)
+    order = get_object_or_404(Order, zarinpal_authority=authority)
+    data = {
+        "MerchantID": settings.ZARINPAL_MERCHANT_ID,
+        "Amount": order.total_price,
+        "Authority": order.zarinpal_authority,
+    }
+    data = json.dumps(data)
+    headers = {'content-type': 'application/json', 'content-length': str(len(data))}
 
-            if response.status_code == 200:
-                response = response.json()
-                if response['Status'] == 100:
-                    ref_id = response['RefID']
-                    order.zarinpal_ref_id = ref_id
-                    order.status = True
-                    order.save()
-                    return render(request, 'verify.html', {'ref_id': ref_id})
-                else:
-                    return render(request, 'verify.html', {'error': f'status error code: {response["Status"]}'})
-            return render(request, 'verify.html', {'error': f'response status code: {response.status_code}'})
+    try:
+        response = requests.post(settings.ZARINPAL_VERIFY, data=data, headers=headers, timeout=10)
+    except requests.exceptions.Timeout:
+        return render(request, 'verify.html', {'error': 'time out error'})
+    except requests.exceptions.ConnectionError:
+        return render(request, 'verify.html', {'error': 'connection error'})
 
-        except requests.exceptions.Timeout:
-            return render(request, 'verify.html', {'error': 'time out error'})
-        except requests.exceptions.ConnectionError:
-            return render(request, 'verify.html', {'error': 'connection error'})
-    return render(request, 'verify.html')
+    if response.status_code != 200:
+        return render(request, 'verify.html', {'error': f'response status code: {response.status_code}'})
+
+    response = response.json()
+    if response['Status'] != 100:
+        return render(request, 'verify.html', {'error': f'status error code: {response["Status"]}'})
+
+    ref_id = response['RefID']
+    order.zarinpal_ref_id = ref_id
+    order.status = True
+    order.save()
+    return render(request, 'verify.html', {'ref_id': ref_id})
+
 
 
 def save_order_user(cart, request):
