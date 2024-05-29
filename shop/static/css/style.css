@@ -43,8 +43,9 @@ Table OF Contents
 9 > CHECKOUT PAGE
 10 > NEWSLETTER
 11 > FOOTER
-11 > SLICK STYLE
-12 > RESPONSIVE
+12 > SLICK STYLE
+13 > RESPONSIVE
+14 > ACCOUNTS
 ------------------------------------*/
 
 /*=========================================================
@@ -2187,4 +2188,12 @@ textarea.input {
     float: none;
     margin-top: 10px;
   }
+}
+
+/*=========================================================
+	14 -> ACCOUNTS
+===========================================================*/
+
+ul.errorlist {
+  color:#D10024;
 }

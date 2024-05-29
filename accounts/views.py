@@ -1,7 +1,7 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .forms import LoginForm
+from .forms import LoginForm, RegisterForm
 from .models import City
 from django.contrib.auth import authenticate, login as django_login
 
@@ -37,3 +37,17 @@ def login(request):
         return render(request, 'login.html', {'form': form})
 
     return render(request, 'login.html', {'form': form})
+
+
+def register(request):
+    if request.method == 'POST':
+        form = RegisterForm(request.POST)
+        if not form.is_valid():
+            return render(request, 'register.html', {'form': form})
+
+        user = form.save()
+        django_login(request, user)
+        return redirect('shop:index')
+    
+    form = RegisterForm()
+    return render(request, 'register.html', {'form': form})

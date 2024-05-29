@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %}Index{% endblock title %}
+{% block title %}Login{% endblock title %}
 {% block content %}
 <div class="container">
     <h1>Login</h1>
@@ -8,6 +8,7 @@
         {% csrf_token %}
         {{ form.as_p }}
         <input type="submit" value="Login">
+        <a href="{% url 'accounts:register' %}">Register</a>
     </form>
     {% if messages %}
         {% for message in messages %}
