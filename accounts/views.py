@@ -33,7 +33,7 @@ def login(request):
         if user is not None:
             django_login(request, user)
             return redirect(next_page)
-        messages.error(request, 'Invalid username or password')
+        messages.error(request, 'Invalid username or password', 'danger')
         return render(request, 'login.html', {'form': form})
 
     return render(request, 'login.html', {'form': form})
