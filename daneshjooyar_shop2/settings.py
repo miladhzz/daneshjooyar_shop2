@@ -137,3 +137,6 @@ ZARINPAL_VERIFY = 'https://sandbox.zarinpal.com/pg/rest/WebGate/PaymentVerificat
 ZARINPAL_STARTPAY = 'https://sandbox.zarinpal.com/pg/StartPay/'
 ZARINPAL_MERCHANT_ID = '123456789012345678901234567890123456'
 ZARINPAL_CALLBACK_URL = 'http://127.0.0.1:8000/shop/verify/'
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

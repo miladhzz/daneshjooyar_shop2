@@ -29,6 +29,7 @@ class User(AbstractUser):
     email = models.EmailField(_("email address"), unique=True)
     deleted = models.BooleanField(default=False, editable=False)
     updated_at = models.DateTimeField(auto_now=True)
+    is_email_verified = models.BooleanField(default=False)
 
     objects = SoftUserManager()
 

@@ -4,6 +4,8 @@ from django.contrib import messages
 from .forms import LoginForm, RegisterForm
 from .models import City
 from django.contrib.auth import authenticate, login as django_login
+from django.core.mail import send_mail
+
 
 
 def edit_profile(request):
@@ -45,9 +47,23 @@ def register(request):
         if not form.is_valid():
             return render(request, 'register.html', {'form': form})
 
-        user = form.save()
-        django_login(request, user)
-        return redirect('shop:index')
+        user = form.save(commit=False)
+        user.is_active = False
+        user.save()
+
+        send_activation_code(form.cleaned_data['email'])
+
+        messages.info(request, 'An activation email has been sent to you. Please verify your email.')
+        return redirect('accounts:login')
     
     form = RegisterForm()
     return render(request, 'register.html', {'form': form})
+
+
+def send_activation_code(email_address):
+    send_mail(
+        subject='Activate your email',
+        message='Please click on the link below to activate user account.',
+        from_email='admin@admin.com',
+        recipient_list=[email_address,]
+    )
