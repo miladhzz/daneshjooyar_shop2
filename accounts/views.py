@@ -1,11 +1,15 @@
+from django.contrib.auth.tokens import default_token_generator
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, reverse
 from django.contrib import messages
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
+
 from .forms import LoginForm, RegisterForm
 from .models import City
 from django.contrib.auth import authenticate, login as django_login
 from django.core.mail import send_mail
-
+from django.contrib.sites.shortcuts import get_current_site
 
 
 def edit_profile(request):
@@ -51,7 +55,13 @@ def register(request):
         user.is_active = False
         user.save()
 
-        send_activation_code(form.cleaned_data['email'])
+        current_site = get_current_site(request)
+        token = default_token_generator.make_token(user)
+        encoded_user_id = urlsafe_base64_encode(force_bytes(user.id))
+        activation_path = reverse('accounts:active_email', args=[encoded_user_id, token])
+        activation_url = f'http://{current_site}{activation_path}'
+
+        send_activation_code(activation_url, form.cleaned_data['email'])
 
         messages.info(request, 'An activation email has been sent to you. Please verify your email.')
         return redirect('accounts:login')
@@ -60,10 +70,14 @@ def register(request):
     return render(request, 'register.html', {'form': form})
 
 
-def send_activation_code(email_address):
+def send_activation_code(activation_url, email_address):
     send_mail(
         subject='Activate your email',
-        message='Please click on the link below to activate user account.',
+        message=f'Please click on the link below to activate user account. {activation_url}',
         from_email='admin@admin.com',
-        recipient_list=[email_address,]
+        recipient_list=[email_address]
     )
+
+
+def active_email(request, encoded_user_id, token):
+    return  HttpResponse(f'<h1>{encoded_user_id}{token}</h1>')
