@@ -2,11 +2,11 @@ from django.contrib.auth.tokens import default_token_generator
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, reverse
 from django.contrib import messages
-from django.utils.encoding import force_bytes
-from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes, force_str
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 
 from .forms import LoginForm, RegisterForm
-from .models import City
+from .models import City, User
 from django.contrib.auth import authenticate, login as django_login
 from django.core.mail import send_mail
 from django.contrib.sites.shortcuts import get_current_site
@@ -80,4 +80,15 @@ def send_activation_code(activation_url, email_address):
 
 
 def active_email(request, encoded_user_id, token):
-    return  HttpResponse(f'<h1>{encoded_user_id}{token}</h1>')
+    try:
+        user_id = force_str(urlsafe_base64_decode(encoded_user_id))
+        user = User.objects.get(id=user_id, is_active=False)
+    except (ValueError, User.DoesNotExist):
+        return HttpResponse('<h1>Error, your request is invalid.</h1>')
+
+    if not default_token_generator.check_token(user, token):
+        return HttpResponse('<h1>Error, your activation link is invalid.</h1>')
+
+    user.is_active = True
+    user.save()
+    return HttpResponse('<h1>Your account has been activated.</h1>')
