@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Mobile Login{% endblock title %}
+{% block content %}
+<div class="container">
+    <h1>Verify OTP</h1>
+    <form method="post">
+        <label for="otp">OTP:</label>
+        <input type="text" name="otp" id="otp" />
+        {% csrf_token %}
+        <input type="submit" value="Login">
+    </form>
+</div>
+{% endblock content %}

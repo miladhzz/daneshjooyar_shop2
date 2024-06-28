@@ -4,12 +4,12 @@ from django.shortcuts import render, redirect, reverse
 from django.contrib import messages
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-
+from .utility import send_otp, send_activation_code
 from .forms import LoginForm, RegisterForm
 from .models import City, User
-from django.contrib.auth import authenticate, login as django_login
-from django.core.mail import send_mail
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.cache import cache
 
 
 def edit_profile(request):
@@ -25,7 +25,7 @@ def get_cities(request):
     return JsonResponse(list(cities), safe=False)
 
 
-def login(request):
+def login_view(request):
     next_page = request.GET.get('next')
     if request.method == 'GET':
         form = LoginForm()
@@ -37,12 +37,17 @@ def login(request):
         password = form.cleaned_data['password']
         user = authenticate(request, username=username, password=password)
         if user is not None:
-            django_login(request, user)
+            login(request, user)
             return redirect(next_page)
         messages.error(request, 'Invalid username or password', 'danger')
         return render(request, 'login.html', {'form': form})
 
     return render(request, 'login.html', {'form': form})
+
+
+def logout_view(request):
+    logout(request)
+    return redirect(reverse('shop:index'))
 
 
 def register(request):
@@ -70,15 +75,6 @@ def register(request):
     return render(request, 'register.html', {'form': form})
 
 
-def send_activation_code(activation_url, email_address):
-    send_mail(
-        subject='Activate your email',
-        message=f'Please click on the link below to activate user account. {activation_url}',
-        from_email='admin@admin.com',
-        recipient_list=[email_address]
-    )
-
-
 def active_email(request, encoded_user_id, token):
     try:
         user_id = force_str(urlsafe_base64_decode(encoded_user_id))
@@ -92,3 +88,29 @@ def active_email(request, encoded_user_id, token):
     user.is_active = True
     user.save()
     return HttpResponse('<h1>Your account has been activated.</h1>')
+
+
+def mobile_login(request):
+    if request.method == 'POST':
+        mobile = request.POST.get('mobile')
+        if mobile:
+            send_otp(mobile)
+            request.session['mobile'] = mobile
+            return redirect(reverse('accounts:verify_otp'))
+    return render(request, 'mobile_login.html')
+
+
+def verify_otp(request):
+    mobile = request.session.get('mobile')
+    if not mobile:
+        return redirect(reverse('accounts:mobile_login'))
+
+    if request.method == 'POST':
+        otp = request.POST.get('otp')
+        cached_otp = cache.get(mobile)
+        if cached_otp and cached_otp == otp:
+            user = User.objects.get(mobile=mobile)
+            login(request, user)
+            return redirect(reverse('shop:index'))
+
+    return render(request, 'verify_otp.html')
