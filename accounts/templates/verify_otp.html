@@ -10,5 +10,38 @@
         {% csrf_token %}
         <input type="submit" value="Login">
     </form>
+    <p id="timer-box">Resend otp: <span id="timer">300</span> second</p>
+    <p id="resend-link"><a href="{% url 'accounts:resend_otp' %}">Resend OTP</a></p>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                <p>{{ message }}</p>
+            </div>
+        {% endfor %}
+    {% endif %}
 </div>
 {% endblock content %}
+{% block scripts %}
+     <script>
+        $(document).ready(function() {
+            let timerBox = $('#timer-box');
+            let timerSpan = $('#timer');
+            let resendLink = $('#resend-link');
+            let timeLeft = 300;
+
+            resendLink.hide();
+
+            let interval = setInterval(function() {
+                if (timeLeft <= 0){
+                    clearInterval(interval);
+                    resendLink.show();
+                    timerBox.hide();
+                }else {
+                    timerSpan.text(timeLeft);
+                    timeLeft -= 1;
+                }
+            },1000);
+
+        });
+    </script>
+{% endblock scripts %}

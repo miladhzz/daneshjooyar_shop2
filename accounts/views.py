@@ -94,8 +94,11 @@ def mobile_login(request):
     if request.method == 'POST':
         mobile = request.POST.get('mobile')
         if mobile:
-            send_otp(mobile)
             request.session['mobile'] = mobile
+            if cache.get(mobile):
+                return redirect(reverse('accounts:verify_otp'))
+
+            send_otp(mobile)
             return redirect(reverse('accounts:verify_otp'))
     return render(request, 'mobile_login.html')
 
@@ -108,9 +111,24 @@ def verify_otp(request):
     if request.method == 'POST':
         otp = request.POST.get('otp')
         cached_otp = cache.get(mobile)
-        if cached_otp and cached_otp == otp:
+        if cached_otp and str(cached_otp) == otp:
             user = User.objects.get(mobile=mobile)
             login(request, user)
             return redirect(reverse('shop:index'))
 
+        messages.error(request, 'Your otp is incorrect', 'danger')
+
     return render(request, 'verify_otp.html')
+
+
+def resend_otp(request):
+    mobile = request.session.get('mobile')
+
+    if not mobile:
+        return redirect(reverse('accounts:mobile_login'))
+
+    if cache.get(mobile):
+        return redirect(reverse('accounts:verify_otp'))
+
+    send_otp(mobile)
+    return redirect(reverse('accounts:verify_otp'))

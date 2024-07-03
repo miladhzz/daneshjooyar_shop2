@@ -12,4 +12,5 @@ urlpatterns = [
     path('active-email/<str:encoded_user_id>/<str:token>/', views.active_email, name='active_email'),
     path('mobile-login/', views.mobile_login, name='mobile_login'),
     path('verify-otp/', views.verify_otp, name='verify_otp'),
+    path('resend-otp/', views.resend_otp, name='resend_otp'),
 ]
