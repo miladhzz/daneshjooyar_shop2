@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.tokens import default_token_generator
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, reverse
@@ -12,6 +13,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.cache import cache
 
 
+@login_required
 def edit_profile(request):
     return HttpResponse('<h1>Edit Profile</h1>')
 
@@ -112,8 +114,16 @@ def verify_otp(request):
         otp = request.POST.get('otp')
         cached_otp = cache.get(mobile)
         if cached_otp and str(cached_otp) == otp:
-            user = User.objects.get(mobile=mobile)
+            user, _ = User.objects.get_or_create(
+                mobile=mobile,
+                defaults={
+                    'username': mobile,
+                    'email': f'{mobile}@mail.com'
+                }
+            )
+
             login(request, user)
+            cache.delete(mobile)
             return redirect(reverse('shop:index'))
 
         messages.error(request, 'Your otp is incorrect', 'danger')
