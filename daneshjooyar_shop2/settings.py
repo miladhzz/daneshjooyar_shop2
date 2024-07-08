@@ -140,3 +140,8 @@ ZARINPAL_CALLBACK_URL = 'http://127.0.0.1:8000/shop/verify/'
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'accounts.backends.EmailBackend'
+]

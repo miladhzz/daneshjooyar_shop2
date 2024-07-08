@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from .utility import send_otp, send_activation_code
-from .forms import LoginForm, RegisterForm
+from .forms import LoginForm, RegisterForm, EmailLoginForm
 from .models import City, User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.sites.shortcuts import get_current_site
@@ -45,6 +45,26 @@ def login_view(request):
         return render(request, 'login.html', {'form': form})
 
     return render(request, 'login.html', {'form': form})
+
+
+def email_login(request):
+    if request.method == 'GET':
+        form = EmailLoginForm()
+        return render(request, 'login.html', {'form': form})
+
+    form = EmailLoginForm(request.POST)
+    if form.is_valid():
+        email = form.cleaned_data['email']
+        password = form.cleaned_data['password']
+        user = authenticate(request, email=email, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect(reverse('shop:index'))
+        messages.error(request, 'Invalid email or password', 'danger')
+        return render(request, 'login.html', {'form': form})
+
+    return render(request, 'login.html', {'form': form})
+
 
 
 def logout_view(request):

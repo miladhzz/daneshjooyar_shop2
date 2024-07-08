@@ -10,8 +10,6 @@
         <input type="submit" value="Login">
         <a href="{% url 'accounts:register' %}">Register</a>
     </form>
-    <hr />
-    <a href="{% url 'accounts:mobile_login' %}">Mobile Login</a>
     {% if messages %}
         {% for message in messages %}
             <div class="alert alert-{{ message.tags }}">
@@ -19,5 +17,8 @@
             </div>
         {% endfor %}
     {% endif %}
+    <hr />
+    <a href="{% url 'accounts:mobile_login' %}">Mobile Login </a>
+    <a href="{% url 'accounts:email_login' %}"> Email Login</a>
 </div>
 {% endblock content %}
