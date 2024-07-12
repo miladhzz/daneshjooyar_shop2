@@ -66,7 +66,6 @@ def email_login(request):
     return render(request, 'login.html', {'form': form})
 
 
-
 def logout_view(request):
     logout(request)
     return redirect(reverse('shop:index'))
@@ -134,19 +133,20 @@ def verify_otp(request):
         otp = request.POST.get('otp')
         cached_otp = cache.get(mobile)
         if cached_otp and str(cached_otp) == otp:
-            user, _ = User.objects.get_or_create(
+            User.objects.get_or_create(
                 mobile=mobile,
                 defaults={
                     'username': mobile,
                     'email': f'{mobile}@mail.com'
                 }
             )
+            user = authenticate(mobile=mobile)
+            if user is not None:
+                login(request, user)
+                cache.delete(mobile)
+                return redirect(reverse('shop:index'))
 
-            login(request, user)
-            cache.delete(mobile)
-            return redirect(reverse('shop:index'))
-
-        messages.error(request, 'Your otp is incorrect', 'danger')
+        messages.error(request, 'Your otp is incorrect or yor user account is inactive', 'danger')
 
     return render(request, 'verify_otp.html')
 
