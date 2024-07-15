@@ -8,4 +8,5 @@ urlpatterns = [
     path('', include("website.urls", namespace="website")),
     path('shop/', include("shop.urls", namespace="shop")),
     path('accounts/', include("accounts.urls", namespace="accounts")),
+    path('accounts-allauth/', include('allauth.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
