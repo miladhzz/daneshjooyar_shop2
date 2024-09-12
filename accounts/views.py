@@ -5,6 +5,8 @@ from django.shortcuts import render, redirect, reverse
 from django.contrib import messages
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.views.decorators.http import require_GET
+
 from .utility import send_otp, send_activation_code
 from .forms import LoginForm, RegisterForm, EmailLoginForm
 from .models import City, User
@@ -13,11 +15,14 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.cache import cache
 
 
+from django.views import View
+
 @login_required
 def edit_profile(request):
     return HttpResponse('<h1>Edit Profile</h1>')
 
 
+@require_GET
 def get_cities(request):
     province_id = request.GET.get('province_id')
     if not province_id:
@@ -27,7 +32,27 @@ def get_cities(request):
     return JsonResponse(list(cities), safe=False)
 
 
-def login_view(request):
+class LoginView(View):
+    def get(self, request, *args, **kwargs):
+        next_page = request.GET.get('next')
+        if request.method == 'GET':
+            form = LoginForm()
+            return render(request, 'login.html', {'form': form})
+
+    # form = LoginForm(request.POST)
+    # if form.is_valid():
+    #     username = form.cleaned_data['username']
+    #     password = form.cleaned_data['password']
+    #     user = authenticate(request, username=username, password=password)
+    #     if user is not None:
+    #         login(request, user)
+    #         return redirect(next_page)
+    #     messages.error(request, 'Invalid username or password', 'danger')
+    #     return render(request, 'login.html', {'form': form})
+    #
+    # return render(request, 'login.html', {'form': form})
+
+def login_view2(request):
     next_page = request.GET.get('next')
     if request.method == 'GET':
         form = LoginForm()
