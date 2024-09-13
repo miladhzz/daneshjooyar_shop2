@@ -34,42 +34,24 @@ def get_cities(request):
 
 class LoginView(View):
     def get(self, request, *args, **kwargs):
-        next_page = request.GET.get('next')
         if request.method == 'GET':
             form = LoginForm()
             return render(request, 'login.html', {'form': form})
 
-    # form = LoginForm(request.POST)
-    # if form.is_valid():
-    #     username = form.cleaned_data['username']
-    #     password = form.cleaned_data['password']
-    #     user = authenticate(request, username=username, password=password)
-    #     if user is not None:
-    #         login(request, user)
-    #         return redirect(next_page)
-    #     messages.error(request, 'Invalid username or password', 'danger')
-    #     return render(request, 'login.html', {'form': form})
-    #
-    # return render(request, 'login.html', {'form': form})
+    def post(self, request, *args, **kwargs):
+        next_page = request.GET.get('next')
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect(next_page if next_page else '/')
+            messages.error(request, 'Invalid username or password', 'danger')
+            return render(request, 'login.html', {'form': form})
 
-def login_view2(request):
-    next_page = request.GET.get('next')
-    if request.method == 'GET':
-        form = LoginForm()
         return render(request, 'login.html', {'form': form})
-
-    form = LoginForm(request.POST)
-    if form.is_valid():
-        username = form.cleaned_data['username']
-        password = form.cleaned_data['password']
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return redirect(next_page)
-        messages.error(request, 'Invalid username or password', 'danger')
-        return render(request, 'login.html', {'form': form})
-
-    return render(request, 'login.html', {'form': form})
 
 
 def email_login(request):
