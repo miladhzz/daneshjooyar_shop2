@@ -6,16 +6,14 @@ from django.contrib import messages
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.views.decorators.http import require_GET
-
 from .utility import send_otp, send_activation_code
 from .forms import LoginForm, RegisterForm, EmailLoginForm
 from .models import City, User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.cache import cache
-
-
 from django.views import View
+
 
 @login_required
 def edit_profile(request):
@@ -54,23 +52,24 @@ class LoginView(View):
         return render(request, 'login.html', {'form': form})
 
 
-def email_login(request):
-    if request.method == 'GET':
+class EmailLogin(View):
+    def get(self, request, *args, **kwargs):
         form = EmailLoginForm()
         return render(request, 'login.html', {'form': form})
 
-    form = EmailLoginForm(request.POST)
-    if form.is_valid():
-        email = form.cleaned_data['email']
-        password = form.cleaned_data['password']
-        user = authenticate(request, email=email, password=password)
-        if user is not None:
-            login(request, user)
-            return redirect(reverse('shop:index'))
-        messages.error(request, 'Invalid email or password', 'danger')
-        return render(request, 'login.html', {'form': form})
+    def post(self, request, *args, **kwargs):
+        form = EmailLoginForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
+            user = authenticate(request, email=email, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect(reverse('shop:index'))
+            messages.error(request, 'Invalid email or password', 'danger')
+            return render(request, 'login.html', {'form': form})
 
-    return render(request, 'login.html', {'form': form})
+        return render(request, 'login.html', {'form': form})
 
 
 def logout_view(request):
@@ -78,8 +77,12 @@ def logout_view(request):
     return redirect(reverse('shop:index'))
 
 
-def register(request):
-    if request.method == 'POST':
+class Register(View):
+    def get(self, request, *args, **kwargs):
+        form = RegisterForm()
+        return render(request, 'register.html', {'form': form})
+
+    def post(self, request, *args, **kwargs):
         form = RegisterForm(request.POST)
         if not form.is_valid():
             return render(request, 'register.html', {'form': form})
@@ -98,9 +101,6 @@ def register(request):
 
         messages.info(request, 'An activation email has been sent to you. Please verify your email.')
         return redirect('accounts:login')
-    
-    form = RegisterForm()
-    return render(request, 'register.html', {'form': form})
 
 
 def active_email(request, encoded_user_id, token):
@@ -118,8 +118,11 @@ def active_email(request, encoded_user_id, token):
     return HttpResponse('<h1>Your account has been activated.</h1>')
 
 
-def mobile_login(request):
-    if request.method == 'POST':
+class MobileLogin(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'mobile_login.html')
+
+    def post(self, request, *args, **kwargs):
         mobile = request.POST.get('mobile')
         if mobile:
             request.session['mobile'] = mobile
@@ -128,15 +131,20 @@ def mobile_login(request):
 
             send_otp(mobile)
             return redirect(reverse('accounts:verify_otp'))
-    return render(request, 'mobile_login.html')
 
 
-def verify_otp(request):
-    mobile = request.session.get('mobile')
-    if not mobile:
-        return redirect(reverse('accounts:mobile_login'))
+class VerifyOtp(View):
+    def get(self, request, *args, **kwargs):
+        mobile = request.session.get('mobile')
+        if not mobile:
+            return redirect(reverse('accounts:mobile_login'))
+        return render(request, 'verify_otp.html')
 
-    if request.method == 'POST':
+    def post(self, request, *args, **kwargs):
+        mobile = request.session.get('mobile')
+        if not mobile:
+            return redirect(reverse('accounts:mobile_login'))
+
         otp = request.POST.get('otp')
         cached_otp = cache.get(mobile)
         if cached_otp and str(cached_otp) == otp:
@@ -154,18 +162,18 @@ def verify_otp(request):
                 return redirect(reverse('shop:index'))
 
         messages.error(request, 'Your otp is incorrect or yor user account is inactive', 'danger')
+        return render(request, 'verify_otp.html')
 
-    return render(request, 'verify_otp.html')
 
+class ResendOtp(View):
+    def get(self, request, *args, **kwargs):
+        mobile = request.session.get('mobile')
 
-def resend_otp(request):
-    mobile = request.session.get('mobile')
+        if not mobile:
+            return redirect(reverse('accounts:mobile_login'))
 
-    if not mobile:
-        return redirect(reverse('accounts:mobile_login'))
+        if cache.get(mobile):
+            return redirect(reverse('accounts:verify_otp'))
 
-    if cache.get(mobile):
+        send_otp(mobile)
         return redirect(reverse('accounts:verify_otp'))
-
-    send_otp(mobile)
-    return redirect(reverse('accounts:verify_otp'))
