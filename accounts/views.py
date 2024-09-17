@@ -103,19 +103,20 @@ class Register(View):
         return redirect('accounts:login')
 
 
-def active_email(request, encoded_user_id, token):
-    try:
-        user_id = force_str(urlsafe_base64_decode(encoded_user_id))
-        user = User.objects.get(id=user_id, is_active=False)
-    except (ValueError, User.DoesNotExist):
-        return HttpResponse('<h1>Error, your request is invalid.</h1>')
+class ActiveEmail(View):
+    def get(self, request, *args, **kwargs):
+        try:
+            user_id = force_str(urlsafe_base64_decode(kwargs.get('encoded_user_id')))
+            user = User.objects.get(id=user_id, is_active=False)
+        except (ValueError, User.DoesNotExist):
+            return HttpResponse('<h1>Error, your request is invalid.</h1>')
 
-    if not default_token_generator.check_token(user, token):
-        return HttpResponse('<h1>Error, your activation link is invalid.</h1>')
+        if not default_token_generator.check_token(user, kwargs.get('token')):
+            return HttpResponse('<h1>Error, your activation link is invalid.</h1>')
 
-    user.is_active = True
-    user.save()
-    return HttpResponse('<h1>Your account has been activated.</h1>')
+        user.is_active = True
+        user.save()
+        return HttpResponse('<h1>Your account has been activated.</h1>')
 
 
 class MobileLogin(View):
