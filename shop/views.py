@@ -10,6 +10,8 @@ import json
 import requests
 from django.views import View
 from .utility import save_order_user, save_order_different
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 
 
 class Index(View):
@@ -37,7 +39,7 @@ class Store(View):
         return render(request, "store.html", {'products': products})
 
 
-# TODO login_required
+@method_decorator(login_required, name='dispatch')
 class Checkout(View):
 
     def get(self, request, *args, **kwargs):
@@ -70,7 +72,7 @@ class Checkout(View):
         return redirect(reverse('shop:to_bank', args=[order.id]))
 
 
-# TODO login_required
+@method_decorator(login_required, name='dispatch')
 class ToBank(View):
     def get(self, request, *args, **kwargs):
         order_id = kwargs.get('order_id')
