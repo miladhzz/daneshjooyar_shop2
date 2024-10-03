@@ -17,6 +17,8 @@ from django.utils.decorators import method_decorator
 
 class Index(ListView):
     model = Product
+    template_name = 'index.html'
+    context_object_name = 'products'
 
 
 class Detail(View):
