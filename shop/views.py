@@ -9,15 +9,14 @@ from django.conf import settings
 import json
 import requests
 from django.views import View
+from django.views.generic import ListView
 from .utility import save_order_user, save_order_different
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
 
-class Index(View):
-    def get(self, request, *args, **kwargs):
-        products = Product.objects.all()
-        return render(request, "index.html", {'products': products})
+class Index(ListView):
+    model = Product
 
 
 class Detail(View):
