@@ -9,7 +9,7 @@ from django.conf import settings
 import json
 import requests
 from django.views import View
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 from .utility import save_order_user, save_order_different
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
@@ -21,11 +21,12 @@ class Index(ListView):
     context_object_name = 'products'
 
 
-class Detail(View):
-    def get(self, request, *args, **kwargs):
-        product = get_object_or_404(Product, id=kwargs.get('id'))
-        context = {'product': product}
-        return render(request, "detail.html", context)
+class Detail(DetailView):
+    model = Product
+    template_name = 'detail.html'
+    context_object_name = 'product'
+    pk_url_kwarg = 'id'
+
 
 
 class Store(View):
