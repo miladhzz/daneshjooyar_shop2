@@ -28,18 +28,18 @@ class Detail(DetailView):
     pk_url_kwarg = 'id'
 
 
+class Store(ListView):
+    model = Product
+    template_name = 'store.html'
+    context_object_name = 'products'
 
-class Store(View):
-    def get(self, request, *args, **kwargs):
-        category = request.GET.get('category')
+    def get_queryset(self):
+        category = self.request.GET.get('category')
 
-        if category is not None:
-            products = Product.objects.filter(category__title=category)
-            return render(request, "store.html", {'products': products})
+        if category:
+            return Product.objects.filter(category__title=category)
 
-        products = Product.objects.all()
-        return render(request, "store.html", {'products': products})
-
+        return Product.objects.all()
 
 @method_decorator(login_required, name='dispatch')
 class Checkout(View):
