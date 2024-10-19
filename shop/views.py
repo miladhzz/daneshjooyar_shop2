@@ -41,15 +41,18 @@ class Store(ListView):
         return Product.objects.all()
 
 
-@method_decorator(login_required, name='dispatch')
 class Checkout(View):
 
-    def get(self, request, *args, **kwargs):
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
         try:
             Profile.objects.get(user=request.user)
         except Profile.DoesNotExist:
             return redirect(reverse('accounts:edit_profile') + '?next=' + reverse('shop:checkout'))
 
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
         context = {
             'provinces': Province.objects.all()
         }
