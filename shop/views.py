@@ -29,7 +29,6 @@ class Detail(DetailView):
 
 
 class Store(ListView):
-    model = Product
     template_name = 'store.html'
     context_object_name = 'products'
 
@@ -40,6 +39,7 @@ class Store(ListView):
             return Product.objects.filter(category__title=category)
 
         return Product.objects.all()
+
 
 @method_decorator(login_required, name='dispatch')
 class Checkout(View):
