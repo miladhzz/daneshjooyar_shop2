@@ -1,15 +1,15 @@
 from django.http import Http404
-from django.shortcuts import render
 from .models import Product, Order
-from django.shortcuts import get_object_or_404, redirect, reverse
+from django.shortcuts import render, get_object_or_404, redirect, reverse
+from django.urls import reverse_lazy
 from .cart import Cart
 from accounts.models import Profile, Province
-from .forms import OrderForm
+from .forms import OrderForm, AddToCartForm
 from django.conf import settings
 import json
 import requests
 from django.views import View
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, FormView
 from .utility import save_order_user, save_order_different
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
@@ -150,18 +150,22 @@ class Verify(View):
         return render(request, 'verify.html', {'ref_id': ref_id})
 
 
-class AddToCart(View):
-    def post(self, request, *args, **kwargs):
-        product_id = request.POST.get('product_id')
-        quantity = request.POST.get('quantity')
-        update = True if request.POST.get('update') == '1' else False
+class AddToCart(FormView):
+    form_class = AddToCartForm
+    http_method_names = ['post']
+    success_url = reverse_lazy('shop:cart_detail')
+
+    def form_valid(self, form):
+        product_id = form.cleaned_data['product_id']
+        quantity = form.cleaned_data['quantity']
+        update = True if form.cleaned_data['update'] == 1 else False
 
         product = get_object_or_404(Product, id=product_id)
 
-        cart = Cart(request)
-        cart.add(product_id, product.price, int(quantity), update)
+        cart = Cart(self.request)
+        cart.add(product_id, product.price, quantity, update)
 
-        return redirect(reverse('shop:cart_detail'))
+        return redirect(self.get_success_url())
 
 
 class CartDetail(View):
