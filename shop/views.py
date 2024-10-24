@@ -9,7 +9,7 @@ from django.conf import settings
 import json
 import requests
 from django.views import View
-from django.views.generic import ListView, DetailView, FormView
+from django.views.generic import ListView, DetailView, FormView, TemplateView
 from .utility import save_order_user, save_order_different
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
@@ -168,9 +168,8 @@ class AddToCart(FormView):
         return redirect(self.get_success_url())
 
 
-class CartDetail(View):
-    def get(self, request, *args, **kwargs):
-        return render(request, 'cart_detail.html')
+class CartDetail(TemplateView):
+    template_name = 'cart_detail.html'
 
 
 class RemoveFromCart(View):
