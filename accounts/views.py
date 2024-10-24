@@ -13,7 +13,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.cache import cache
 from django.views import View
-
+from django.views.generic import FormView
 
 @login_required
 def edit_profile(request):
@@ -30,26 +30,22 @@ def get_cities(request):
     return JsonResponse(list(cities), safe=False)
 
 
-class LoginView(View):
-    def get(self, request, *args, **kwargs):
-        if request.method == 'GET':
-            form = LoginForm()
-            return render(request, 'login.html', {'form': form})
+class LoginView(FormView):
+    template_name = 'login.html'
+    form_class = LoginForm
 
-    def post(self, request, *args, **kwargs):
-        next_page = request.GET.get('next')
-        form = LoginForm(request.POST)
-        if form.is_valid():
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
-            user = authenticate(request, username=username, password=password)
-            if user is not None:
-                login(request, user)
-                return redirect(next_page if next_page else '/')
-            messages.error(request, 'Invalid username or password', 'danger')
-            return render(request, 'login.html', {'form': form})
+    def form_valid(self, form):
+        username = form.cleaned_data['username']
+        password = form.cleaned_data['password']
+        user = authenticate(self.request, username=username, password=password)
 
-        return render(request, 'login.html', {'form': form})
+        if user is not None:
+            login(self.request, user)
+            next_page = self.request.GET.get('next')
+            return redirect(next_page if next_page else '/')
+
+        messages.error(self.request, 'Invalid username or password', 'danger')
+        return render(self.request, 'login.html', {'form': form})
 
 
 class EmailLogin(View):
