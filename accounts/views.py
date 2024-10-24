@@ -70,21 +70,16 @@ def logout_view(request):
     return redirect(reverse('shop:index'))
 
 
-class Register(View):
-    def get(self, request, *args, **kwargs):
-        form = RegisterForm()
-        return render(request, 'register.html', {'form': form})
+class Register(FormView):
+    template_name = 'register.html'
+    form_class = RegisterForm
 
-    def post(self, request, *args, **kwargs):
-        form = RegisterForm(request.POST)
-        if not form.is_valid():
-            return render(request, 'register.html', {'form': form})
-
+    def form_valid(self, form):
         user = form.save(commit=False)
         user.is_active = False
         user.save()
 
-        current_site = get_current_site(request)
+        current_site = get_current_site(self.request)
         token = default_token_generator.make_token(user)
         encoded_user_id = urlsafe_base64_encode(force_bytes(user.id))
         activation_path = reverse('accounts:active_email', args=[encoded_user_id, token])
@@ -92,7 +87,7 @@ class Register(View):
 
         send_activation_code(activation_url, form.cleaned_data['email'])
 
-        messages.info(request, 'An activation email has been sent to you. Please verify your email.')
+        messages.info(self.request, 'An activation email has been sent to you. Please verify your email.')
         return redirect('accounts:login')
 
 
