@@ -48,24 +48,21 @@ class LoginView(FormView):
         return render(self.request, 'login.html', {'form': form})
 
 
-class EmailLogin(View):
-    def get(self, request, *args, **kwargs):
-        form = EmailLoginForm()
-        return render(request, 'login.html', {'form': form})
+class EmailLogin(FormView):
+    template_name = 'login.html'
+    form_class = EmailLoginForm
 
-    def post(self, request, *args, **kwargs):
-        form = EmailLoginForm(request.POST)
-        if form.is_valid():
-            email = form.cleaned_data['email']
-            password = form.cleaned_data['password']
-            user = authenticate(request, email=email, password=password)
-            if user is not None:
-                login(request, user)
-                return redirect(reverse('shop:index'))
-            messages.error(request, 'Invalid email or password', 'danger')
-            return render(request, 'login.html', {'form': form})
+    def form_valid(self, form):
+        email = form.cleaned_data['email']
+        password = form.cleaned_data['password']
+        user = authenticate(self.request, email=email, password=password)
 
-        return render(request, 'login.html', {'form': form})
+        if user is not None:
+            login(self.request, user)
+            return redirect(reverse('shop:index'))
+
+        messages.error(self.request, 'Invalid email or password', 'danger')
+        return render(self.request, 'login.html', {'form': form})
 
 
 def logout_view(request):
