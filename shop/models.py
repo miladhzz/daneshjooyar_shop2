@@ -1,26 +1,6 @@
 from django.db import models
-from django.conf import settings
+from core.models import BaseModel
 from accounts.models import City
-
-
-class BaseModelManager(models.Manager):
-    def get_queryset(self):
-        return super().get_queryset().filter(deleted=False)
-
-
-class BaseModel(models.Model):
-    deleted = models.BooleanField(default=False, editable=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    objects = BaseModelManager()
-
-    class Meta:
-        abstract = True
-    
-    def delete(self, using=None, keep_parents=False):
-        self.deleted = True
-        self.save()
 
 
 class Category(BaseModel):
@@ -47,40 +27,3 @@ class Product(BaseModel):
 
         return reverse("shop:detail", kwargs={"id": self.id, "title": self.title})
 
-
-class Cart(BaseModel):
-    quantity = models.PositiveIntegerField()
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-
-
-class Order(BaseModel):
-    total_price = models.IntegerField()
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    status = models.BooleanField(null=True)
-    note = models.CharField(max_length=200, blank=True)
-    different_address = models.BooleanField(default=False, blank=True)
-    first_name = models.CharField(max_length=50)
-    last_name = models.CharField(max_length=50)
-    mobile = models.CharField(max_length=11)
-    address = models.CharField(max_length=500)
-    city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True)
-    postal_code = models.CharField(max_length=10)
-    zarinpal_authority = models.CharField(max_length=50, null=True)
-    zarinpal_ref_id = models.IntegerField(null=True)
-
-
-class OrderProduct(BaseModel):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField()
-    price = models.IntegerField()
-
-
-class PaymentLog(models.Model):
-    amount = models.IntegerField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    user_id = models.PositiveIntegerField()
-    order_id = models.PositiveIntegerField()
-    status = models.CharField(max_length=100)
-    error_code = models.CharField(max_length=200)

@@ -1,6 +1,7 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from .models import Product, Cart, OrderProduct, Order
+from shop.models import Product
+from .models import Order, OrderProduct, Cart
 from accounts.models import User, Profile
 
 

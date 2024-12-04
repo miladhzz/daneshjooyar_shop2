@@ -1,4 +1,4 @@
-from shop.models import Order, OrderProduct
+from order.models import Order, OrderProduct
 
 
 def save_order_user(cart, request):

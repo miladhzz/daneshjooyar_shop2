@@ -1,9 +1,11 @@
 from django.http import Http404
-from .models import Product, Order
+from .models import Product
+from order.models import Order
 from django.shortcuts import render, get_object_or_404, redirect, reverse
 from django.urls import reverse_lazy
 from .cart import Cart
-from accounts.models import Profile, Province
+from accounts.models import Profile
+from core.models import Province
 from .forms import OrderForm, AddToCartForm
 from django.conf import settings
 import json
