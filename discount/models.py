@@ -7,8 +7,8 @@ from core import DiscountType
 
 class DiscountPrice(BaseModel):
     name = models.CharField(max_length=255)
-    product = models.ManyToManyField(Product, blank=True)
-    category = models.ManyToManyField(Category, blank=True)
+    products = models.ManyToManyField(Product, blank=True)
+    categories = models.ManyToManyField(Category, blank=True)
     start_time = models.DateTimeField(default=timezone.now)
     end_time = models.DateTimeField(null=True, blank=True)
     status = models.BooleanField(default=False)
