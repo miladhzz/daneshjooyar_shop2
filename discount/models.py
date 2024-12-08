@@ -5,7 +5,7 @@ from django.utils import timezone
 from core import DiscountType
 
 
-class DiscountPrice(BaseModel):
+class SpecialPrice(BaseModel):
     name = models.CharField(max_length=255)
     products = models.ManyToManyField(Product, blank=True)
     categories = models.ManyToManyField(Category, blank=True)
