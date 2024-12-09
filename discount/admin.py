@@ -1,4 +1,4 @@
 from django.contrib import admin
-from .models import DiscountPrice
+from .models import SpecialPrice
 
-admin.site.register(DiscountPrice)
+admin.site.register(SpecialPrice)

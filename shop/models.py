@@ -1,4 +1,5 @@
 from django.db import models
+from core import DiscountType
 from core.models import BaseModel
 from accounts.models import City
 
@@ -27,3 +28,11 @@ class Product(BaseModel):
 
         return reverse("shop:detail", kwargs={"id": self.id, "title": self.title})
 
+    def get_price(self, special_price):
+        if special_price.type == DiscountType.FIXED:
+            if self.price > special_price.fixed:
+                return self.price
+            return self.price - special_price.fixed
+
+        discount_amount = self.price * (special_price.percent / 100)
+        return self.price - discount_amount

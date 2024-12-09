@@ -3,6 +3,21 @@ from shop.models import Category, Product
 from core.models import BaseModel
 from django.utils import timezone
 from core import DiscountType
+from django.db.models import F, Q
+
+
+class SpecialPriceManager(models.Manager):
+    def active(self, date=None):
+        if date is None:
+            date = timezone.now()
+        return self.filter(
+            Q(end_time__isnull=True) | Q(end_time__gte=date), start_time__lte=date
+        )
+
+    def expired(self, date=None):
+        if date is None:
+            date = timezone.now()
+        return self.filter(end_time__lt=date, start_time_lt=date)
 
 
 class SpecialPrice(BaseModel):
@@ -11,10 +26,11 @@ class SpecialPrice(BaseModel):
     categories = models.ManyToManyField(Category, blank=True)
     start_time = models.DateTimeField(default=timezone.now)
     end_time = models.DateTimeField(null=True, blank=True)
-    status = models.BooleanField(default=False)
     type = models.CharField(max_length=10, choices=DiscountType.CHOICES, default=DiscountType.FIXED)
     percent = models.PositiveIntegerField(null=True, blank=True)
     fixed = models.PositiveIntegerField(default=0, null=True, blank=True)
+
+    objects = SpecialPriceManager()
 
     def __str__(self):
         return self.name
