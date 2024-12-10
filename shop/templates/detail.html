@@ -77,7 +77,15 @@
 								<a class="review-link" href="#">10 Review(s) | Add your review</a>
 							</div>
 							<div>
-								<h3 class="product-price">{{ product.price }} <del class="product-old-price">$990.00</del></h3>
+								<h3 class="product-price">
+                                    {% if product_price %}
+                                        {{ product_price }}
+                                        <del class="product-old-price"> {{ product.price }}</del>
+                                    {% else %}
+                                        {{ product.price }}
+                                    {% endif %}
+
+                                </h3>
 								<span class="product-available">In Stock</span>
 							</div>
 							<p>{{ product.content }}</p>

@@ -1,23 +1,21 @@
 from .models import SpecialPrice
 
 
-def get_min_special_price(product):
+def get_max_product_fix_special_price(product):
     from shop.models import Category
-    specialPrices = SpecialPrice.objects.active().all()
+    active_special_prices = SpecialPrice.objects.active().all()
     # باید همه رو بیارم نمیشه بگم بالاترین شون.
-    pp = []
-    for specialPrice in specialPrices:
-        products = specialPrice.products.filter(id=product.id)
-        if products.exists():
-            pp.append(
-                {
-                    'id': specialPrice.id,
-                    'fixed': specialPrice.fixed,
+    max_special = None
+    for special_price in active_special_prices:
+        if special_price.products.filter(id=product.id).exists():
+            if max_special is None or special_price.fixed > max_special['fixed']:
+                max_special = {
+                    'id': special_price.id,
+                    'type': special_price.type,
+                    'fixed': special_price.fixed,
                 }
-            )
 
-    max_special = max(pp, key=lambda x: x['fixed'])
-    m = 0
+    return max_special
     # m = DiscountPrice.objects.filter(status=True)
     #
     # m = DiscountPrice.objects.all()[0]
@@ -32,5 +30,5 @@ def get_min_special_price(product):
     #
     # n = DiscountPrice.categories.through.objects.filter(discountprice__status=True)
 
-
     return None
+

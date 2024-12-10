@@ -32,7 +32,8 @@ class Detail(DetailView):
     def get_context_data(self, **kwargs):
         con = super().get_context_data()
         from discount import utils
-        utils.get_min_special_price(self.object)
+        fix_special_price = utils.get_max_product_fix_special_price(self.object)
+        con["product_price"] = self.object.get_price(fix_special_price)
         return con
 
 
