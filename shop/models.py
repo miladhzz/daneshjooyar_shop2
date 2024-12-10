@@ -29,7 +29,7 @@ class Product(BaseModel):
         return reverse("shop:detail", kwargs={"id": self.id, "title": self.title})
 
     def get_price(self, special_price):
-        if special_price is None:
+        if special_price['type'] is None:
             return None
 
         if special_price['type'] == DiscountType.FIXED:
