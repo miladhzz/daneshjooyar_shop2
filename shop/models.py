@@ -46,6 +46,6 @@ class Product(BaseModel):
             percent_discount = int(self.price * (special_price['percent'] / 100))
             percent_price = max(self.price - percent_discount, 0)
 
-        final_price = fixed_price, percent_price
+        final_price = min(fixed_price, percent_price)
         return final_price if final_price < self.price else self.price
 
