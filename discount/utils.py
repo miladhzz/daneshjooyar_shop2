@@ -1,9 +1,15 @@
 from .models import SpecialPrice
+from django.db.models import Q
 
 
-def get_max_product_fix_special_price(product):
-    active_special_prices = SpecialPrice.objects.active().all()
-    # باید همه رو بیارم نمیشه بگم بالاترین شون.
+def get_max_special_price(product):
+    active_special_prices = SpecialPrice.objects.active().filter(
+        Q(products=product) | Q(categories=product.category)
+    ).distinct()
+
+    # active_special_prices = SpecialPrice.objects.active().all()
+    # شاید ک قبلی با دسته بندی مچ نبود
+
     max_special = {
         'fixed_type': None,
         'fixed': None,
@@ -12,29 +18,18 @@ def get_max_product_fix_special_price(product):
     }
 
     for special_price in active_special_prices:
-        if special_price.products.filter(id=product.id).exists():
+        # if special_price.products.filter(id=product.id).exists():
+        # شاید وقتی از دسته بندی استفاده کنم لازم باشه
 
-            if max_special['fixed'] is None or special_price.fixed > max_special['fixed']:
-                max_special['fixed_type'] = special_price.type
-                max_special['fixed'] = special_price.fixed
+        if max_special['fixed'] is None or special_price.fixed > max_special['fixed']:
+            max_special['fixed_type'] = special_price.type
+            max_special['fixed'] = special_price.fixed
 
-            if max_special['percent'] is None or special_price.percent > max_special['percent']:
-                max_special['percent_type'] = special_price.type
-                max_special['percent'] = special_price.percent
+        if max_special['percent'] is None or special_price.percent > max_special['percent']:
+            max_special['percent_type'] = special_price.type
+            max_special['percent'] = special_price.percent
 
     return max_special
-    # m = DiscountPrice.objects.filter(status=True)
-    #
-    # m = DiscountPrice.objects.all()[0]
-    # m2 = m.categories.all()
-    #
-    # m = Category.objects.first()
-    # n = m.discountprice_set.all()
-    #
-    # n = DiscountPrice.categories.through.objects.all()
-    #
-    # n = DiscountPrice.objects.filter(categories__id=1)
-    #
-    # n = DiscountPrice.categories.through.objects.filter(discountprice__status=True)
+
 
 
