@@ -2,7 +2,6 @@ from django.db import models
 from core import DiscountType
 from core.models import BaseModel
 from accounts.models import City
-from discount import utils
 
 
 class Category(BaseModel):
@@ -30,6 +29,8 @@ class Product(BaseModel):
         return reverse("shop:detail", kwargs={"id": self.id, "title": self.title})
 
     def get_price(self):
+        from discount import utils
+
         special_price = utils.get_max_special_price(self)
         if special_price['percent_type'] is None and special_price['fixed_type'] is None:
             return None
@@ -45,6 +46,6 @@ class Product(BaseModel):
             percent_discount = int(self.price * (special_price['percent'] / 100))
             percent_price = max(self.price - percent_discount, 0)
 
-        final_price = min(fixed_price, percent_price)
+        final_price = fixed_price, percent_price
         return final_price if final_price < self.price else self.price
 
