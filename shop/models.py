@@ -28,6 +28,7 @@ class Product(BaseModel):
 
         return reverse("shop:detail", kwargs={"id": self.id, "title": self.title})
 
+    @property
     def get_price(self):
         from discount.utils import get_max_special_price
 
@@ -47,5 +48,5 @@ class Product(BaseModel):
             percent_price = max(self.price - percent_discount, 0)
 
         final_price = min(fixed_price, percent_price)
-        return final_price if final_price < self.price else self.price
+        return final_price if final_price < self.price else None
 
