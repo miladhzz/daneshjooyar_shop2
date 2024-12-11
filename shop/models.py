@@ -29,9 +29,9 @@ class Product(BaseModel):
         return reverse("shop:detail", kwargs={"id": self.id, "title": self.title})
 
     def get_price(self):
-        from discount import utils
+        from discount.utils import get_max_special_price
 
-        special_price = utils.get_max_special_price(self)
+        special_price = get_max_special_price(self)
         if special_price['percent_type'] is None and special_price['fixed_type'] is None:
             return None
 
