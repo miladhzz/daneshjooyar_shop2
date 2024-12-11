@@ -7,9 +7,6 @@ def get_max_special_price(product):
         Q(products=product) | Q(categories=product.category)
     ).distinct()
 
-    # active_special_prices = SpecialPrice.objects.active().all()
-    # شاید ک قبلی با دسته بندی مچ نبود
-
     max_special = {
         'fixed_type': None,
         'fixed': None,
@@ -18,9 +15,6 @@ def get_max_special_price(product):
     }
 
     for special_price in active_special_prices:
-        # if special_price.products.filter(id=product.id).exists():
-        # شاید وقتی از دسته بندی استفاده کنم لازم باشه
-
         if max_special['fixed'] is None or special_price.fixed > max_special['fixed']:
             max_special['fixed_type'] = special_price.type
             max_special['fixed'] = special_price.fixed
