@@ -78,8 +78,8 @@
 							</div>
 							<div>
 								<h3 class="product-price">
-                                    {% if product_price %}
-                                        {{ product_price }}
+                                    {% if product.get_price %}
+                                        {{ product.get_price }}
                                         <del class="product-old-price"> {{ product.price }}</del>
                                     {% else %}
                                         {{ product.price }}
