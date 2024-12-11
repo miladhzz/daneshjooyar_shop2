@@ -29,13 +29,23 @@ class Product(BaseModel):
         return reverse("shop:detail", kwargs={"id": self.id, "title": self.title})
 
     def get_price(self, special_price):
-        if special_price['type'] is None:
+        if special_price['percent_type'] is None and special_price['fixed_type'] is None:
             return None
 
-        if special_price['type'] == DiscountType.FIXED:
-            if self.price < special_price['fixed']:
-                return self.price
-            return self.price - special_price['fixed']
+        fixed_price = 0
+        percent_price = 0
 
-        discount_amount = self.price * (special_price['percent'] / 100)
-        return self.price - discount_amount
+        if special_price['fixed_type']:
+            if self.price < special_price['fixed']:
+                fixed_price = self.price
+            else:
+                fixed_price = self.price - special_price['fixed']
+
+        if special_price['percent_type']:
+            discount_amount = self.price * (special_price['percent'] / 100)
+            percent_price = self.price - discount_amount
+
+        if fixed_price < percent_price:
+            return fixed_price
+        else:
+            return percent_price
