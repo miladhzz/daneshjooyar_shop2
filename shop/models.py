@@ -43,7 +43,7 @@ class Product(BaseModel):
             fixed_discount = special_price['fixed']
             fixed_price = max(self.price - fixed_discount, 0)
 
-        if special_price['percent_type']:
+        if special_price.get('percent_type'):
             percent_discount = int(self.price * (special_price['percent'] / 100))
             percent_price = max(self.price - percent_discount, 0)
 
