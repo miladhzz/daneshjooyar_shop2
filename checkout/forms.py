@@ -8,3 +8,9 @@ class OrderForm(forms.Form):
     address = forms.CharField(max_length=500)
     postal_code = forms.CharField(max_length=10)
     city = forms.IntegerField()
+
+
+class AddToCartForm(forms.Form):
+    product_id = forms.CharField()
+    quantity = forms.IntegerField()
+    update = forms.IntegerField()

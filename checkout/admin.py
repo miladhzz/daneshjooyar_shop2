@@ -19,5 +19,14 @@ class OrderProductAdmin(admin.ModelAdmin):
             order_product.delete()
 
 
+class CartAdmin(admin.ModelAdmin):
+    list_display = ['id', 'product', 'user', 'quantity']
+
+    def delete_queryset(self, request, queryset):
+        for cart in queryset:
+            cart.delete()
+
+
+admin.site.register(models.Cart, CartAdmin)
 admin.site.register(models.Order, OrderAdmin)
 admin.site.register(models.OrderProduct, OrderProductAdmin)

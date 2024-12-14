@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'website',
     'shop',
     'checkout',
-    'cart',
     'discount',
     'payment',
     'accounts',
