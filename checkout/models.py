@@ -5,12 +5,6 @@ from shop.models import Product
 from core.models import City
 
 
-class Cart(BaseModel):
-    quantity = models.PositiveIntegerField()
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-
-
 class Order(BaseModel):
     total_price = models.IntegerField()
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)

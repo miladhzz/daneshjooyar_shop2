@@ -1,6 +1,6 @@
 from django.http import Http404
 from .models import Product
-from order.models import Order
+from checkout.models import Order
 from django.shortcuts import render, get_object_or_404, redirect, reverse
 from django.urls import reverse_lazy
 from .cart import Cart
