@@ -51,7 +51,7 @@ class Checkout(View):
 class AddToCart(FormView):
     form_class = AddToCartForm
     http_method_names = ['post']
-    success_url = reverse_lazy('cart:cart_detail')
+    success_url = reverse_lazy('checkout:cart_detail')
 
     def form_valid(self, form):
         product_id = form.cleaned_data['product_id']
@@ -76,6 +76,6 @@ class RemoveFromCart(View):
         if Product.objects.filter(id=product_id).exists():
             cart = Cart(request)
             cart.remove(str(product_id))
-            return redirect(reverse('cart:cart_detail'))
+            return redirect(reverse('checkout:cart_detail'))
 
         raise Http404('product is not found.')
