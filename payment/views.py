@@ -14,10 +14,10 @@ class ToBank(View):
         order_id = kwargs.get('order_id')
         order = get_object_or_404(Order, id=order_id, user_id=request.user.id, status__isnull=True)
         data = {
-            "MerchantID": settings.ZARINPAL_MERCHANT_ID,
-            "Amount": order.total_price,
-            "Description": f'sandbox, order: {order.id}',
-            "CallbackURL": settings.ZARINPAL_CALLBACK_URL,
+            "merchant_id": settings.ZARINPAL_MERCHANT_ID,
+            "amount": order.total_price,
+            "description": f'sandbox, order: {order.id}',
+            "callback_url": settings.ZARINPAL_CALLBACK_URL,
         }
         data = json.dumps(data)
         headers = {'content-type': 'application/json', 'content-length': str(len(data))}
@@ -33,10 +33,10 @@ class ToBank(View):
             return render(request, 'to_bank.html', {'error': f'response status code: {response.status_code}'})
 
         response = response.json()
-        if response['Status'] != 100:
-            return render(request, 'to_bank.html', {'error': f'status error code: {response["Status"]}'})
+        if response['data']['code'] != 100:
+            return render(request, 'to_bank.html', {'error': f'status error code: {response["data"]["code"]}'})
 
-        authority = response['Authority']
+        authority = response['data']['authority']
         order.zarinpal_authority = authority
         order.status = False
         order.save()
@@ -53,9 +53,9 @@ class Verify(View):
 
         order = get_object_or_404(Order, zarinpal_authority=authority)
         data = {
-            "MerchantID": settings.ZARINPAL_MERCHANT_ID,
-            "Amount": order.total_price,
-            "Authority": order.zarinpal_authority,
+            "merchant_id": settings.ZARINPAL_MERCHANT_ID,
+            "amount": order.total_price,
+            "authority": order.zarinpal_authority,
         }
         data = json.dumps(data)
         headers = {'content-type': 'application/json', 'content-length': str(len(data))}
@@ -71,10 +71,10 @@ class Verify(View):
             return render(request, 'verify.html', {'error': f'response status code: {response.status_code}'})
 
         response = response.json()
-        if response['Status'] != 100:
-            return render(request, 'verify.html', {'error': f'status error code: {response["Status"]}'})
+        if response['data']['code'] != 100:
+            return render(request, 'verify.html', {'error': f'status error code: {response["data"]["code"]}'})
 
-        ref_id = response['RefID']
+        ref_id = response['data']['ref_id']
         order.zarinpal_ref_id = ref_id
         order.status = True
         order.save()
