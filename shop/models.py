@@ -34,7 +34,7 @@ class Product(BaseModel):
 
         special_price = get_max_special_price(self)
         if special_price['percent_type'] is None and special_price['fixed_type'] is None:
-            return None
+            return self.price
 
         fixed_price = self.price
         percent_price = self.price
@@ -47,6 +47,5 @@ class Product(BaseModel):
             percent_discount = int(self.price * (special_price['percent'] / 100))
             percent_price = max(self.price - percent_discount, 0)
 
-        final_price = min(fixed_price, percent_price)
-        return final_price if final_price < self.price else None
+        return min(fixed_price, percent_price)
 

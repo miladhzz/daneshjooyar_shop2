@@ -78,7 +78,7 @@
 							</div>
 							<div>
 								<h3 class="product-price">
-                                    {% if product.get_price %}
+                                    {% if product.get_price < product.price %}
                                         {{ product.get_price }}
                                         <del class="product-old-price"> {{ product.price }}</del>
                                     {% else %}
