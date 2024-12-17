@@ -3,7 +3,7 @@ from django.utils.decorators import method_decorator
 from accounts.models import Profile
 from core.models import Province
 from .forms import OrderForm, AddToCartForm
-from .utils import save_order_different, save_order_user
+from .utils import save_order_different, save_order_user, save_cart_to_db
 from django.views.generic import View, FormView, TemplateView
 from django.urls import reverse_lazy
 from .cart import Cart
@@ -24,6 +24,9 @@ class Checkout(View):
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
+        cart = Cart(request)
+        save_cart_to_db(request, cart)
+
         context = {
             'provinces': Province.objects.all()
         }

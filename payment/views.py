@@ -13,7 +13,7 @@ from core import OrderStatus
 class ToBank(View):
     def get(self, request, *args, **kwargs):
         order_id = kwargs.get('order_id')
-        order = get_object_or_404(Order, id=order_id, user_id=request.user.id, status__isnull=True)
+        order = get_object_or_404(Order, id=order_id, user_id=request.user.id, status=OrderStatus.PENDING_PAYMENT)
         data = {
             "merchant_id": settings.ZARINPAL_MERCHANT_ID,
             "amount": order.total_price,
