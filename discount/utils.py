@@ -18,11 +18,11 @@ def get_max_special_price(product):
     for special_price in active_special_prices:
         if special_price.type == DiscountType.FIXED and (max_special['fixed'] is None or special_price.fixed > max_special['fixed']):
             max_special['fixed_type'] = special_price.type
-            max_special['fixed'] = special_price.fixed
+            max_special['fixed'] = special_price.value
 
         if special_price.type == DiscountType.PERCENTAGE and (max_special['percent'] is None or special_price.percent > max_special['percent']):
             max_special['percent_type'] = special_price.type
-            max_special['percent'] = special_price.percent
+            max_special['percent'] = special_price.value
 
     return max_special
 

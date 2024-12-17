@@ -27,8 +27,7 @@ class SpecialPrice(BaseModel):
     start_time = models.DateTimeField(default=timezone.now)
     end_time = models.DateTimeField(null=True, blank=True)
     type = models.CharField(max_length=10, choices=DiscountType.CHOICES, default=DiscountType.FIXED)
-    percent = models.PositiveIntegerField(null=True, blank=True)
-    fixed = models.PositiveIntegerField(default=0, null=True, blank=True)
+    value = models.PositiveIntegerField()
 
     objects = SpecialPriceManager()
 
