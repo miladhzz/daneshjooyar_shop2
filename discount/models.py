@@ -6,7 +6,7 @@ from core import DiscountType
 from django.db.models import F, Q
 
 
-class SpecialPriceManager(models.Manager):
+class DiscountManager(models.Manager):
     def active(self, date=None):
         if date is None:
             date = timezone.now()
@@ -29,7 +29,21 @@ class SpecialPrice(BaseModel):
     type = models.CharField(max_length=10, choices=DiscountType.CHOICES, default=DiscountType.FIXED)
     value = models.PositiveIntegerField()
 
-    objects = SpecialPriceManager()
+    objects = DiscountManager()
+
+    def __str__(self):
+        return self.name
+
+
+class DiscountCode(BaseModel):
+    code = models.CharField(max_length=100)
+    name = models.CharField(max_length=255)
+    start_time = models.DateTimeField(default=timezone.now)
+    end_time = models.DateTimeField(null=True, blank=True)
+    type = models.CharField(max_length=10, choices=DiscountType.CHOICES, default=DiscountType.FIXED)
+    value = models.PositiveIntegerField()
+
+    objects = DiscountManager()
 
     def __str__(self):
         return self.name
