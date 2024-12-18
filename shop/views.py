@@ -12,7 +12,7 @@ import json
 import requests
 from django.views import View
 from django.views.generic import ListView, DetailView, FormView, TemplateView
-from .utility import save_order_user, save_order_different
+from .utils import save_order_user, save_order_different
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
