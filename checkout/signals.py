@@ -3,6 +3,7 @@ from django.dispatch import receiver
 from shop.models import Product
 from .models import Order, OrderProduct, Cart
 from accounts.models import User, Profile
+from django.contrib.auth.signals import user_logged_in
 
 
 @receiver(post_save, sender=Product)
