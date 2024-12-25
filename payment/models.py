@@ -8,4 +8,3 @@ class PaymentLog(models.Model):
     order_id = models.PositiveIntegerField()
     status = models.CharField(max_length=100)
     error_code = models.CharField(max_length=200)
-

@@ -66,7 +66,7 @@
                             <div class="form-group">
 								Address: {{ request.user.profile.address }}
 							</div>
-                            <a href="{% url 'accounts:edit_profile' %}?next={% url 'shop:checkout' %}" class="edit">Edit</a>
+                            <a href="{% url 'accounts:edit_profile' %}?next={% url 'checkout:checkout' %}" class="edit">Edit</a>
 						</div>
 						<!-- /Billing Details -->
 					</div>

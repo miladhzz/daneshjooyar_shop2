@@ -47,7 +47,7 @@
                 <td>{{ item.price }}</td>
                 <td>
                     <div class="add-to-cart">
-                        <form method="post" action="{% url 'shop:add_to_cart' %}">
+                        <form method="post" action="{% url 'checkout:add_to_cart' %}">
                         <div class="qty-label">
                             Qty
                             <div class="input-number">
@@ -64,7 +64,7 @@
                     </div>
                 </td>
                 <td>{{ item.total_price }}</td>
-                <td><a href="{% url 'shop:remove_from_cart' item.product.id %}">Remove</a></td>
+                <td><a href="{% url 'checkout:remove_from_cart' item.product.id %}">Remove</a></td>
             </tr>
             {% endfor %}
             <tr>
@@ -73,7 +73,7 @@
                 <td>{{ cart.get_total_price }}</td>
             </tr>
         </table>
-        <a href="{% url 'shop:checkout' %}" class="primary-btn order-submit">Checkout</a>
+        <a href="{% url 'checkout:checkout' %}" class="primary-btn order-submit">Checkout</a>
         <a href="{% url 'shop:store' %}" class="shopping">Continue Shopping</a>
         {% endif %}
     </div>

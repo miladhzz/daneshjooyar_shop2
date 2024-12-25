@@ -1,6 +1,3 @@
-from decimal import  Decimal
-
-
 CART_SESSION_ID = 'cart'
 
 

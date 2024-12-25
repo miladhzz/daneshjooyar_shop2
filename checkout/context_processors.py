@@ -1,5 +1,5 @@
 from .cart import Cart
-from .models import Product
+from shop.models import Product
 from decimal import Decimal
 
 
