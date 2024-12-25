@@ -41,12 +41,12 @@ class Checkout(View):
                 return render(request, "checkout.html")
             order = save_order_different(cart, order_form, request)
             cart.clear()
-            return redirect(reverse('shop:to_bank', args=[order.id]))
+            return redirect(reverse('payment:to_bank', args=[order.id]))
 
         # not different_address:
         order = save_order_user(cart, request)
         cart.clear()
-        return redirect(reverse('shop:to_bank', args=[order.id]))
+        return redirect(reverse('payment:to_bank', args=[order.id]))
 
 
 class AddToCart(FormView):

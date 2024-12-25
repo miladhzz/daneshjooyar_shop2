@@ -1,9 +1,12 @@
 from .models import SpecialPrice
 from core import DiscountType
+from django.db.models import Q
 
 
 def get_special_price(product):
-    special_prices = SpecialPrice.objects.active().filter(products=product).distinct()
+    special_prices = SpecialPrice.objects.active().filter(
+        Q(products=product) | Q(categories=product.category)
+    ).distinct()
 
     max_special = {
         'fixed_type': None,

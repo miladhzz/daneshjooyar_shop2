@@ -137,11 +137,11 @@ MEDIA_ROOT = 'media'
 MEDIA_URL = 'media/'
 
 
-ZARINPAL_REQUEST = 'https://sandbox.zarinpal.com/pg/rest/WebGate/PaymentRequest.json'
-ZARINPAL_VERIFY = 'https://sandbox.zarinpal.com/pg/rest/WebGate/PaymentVerification.json'
+ZARINPAL_REQUEST = 'https://sandbox.zarinpal.com/pg/v4/payment/request.json'
+ZARINPAL_VERIFY = 'https://sandbox.zarinpal.com/pg/v4/payment/verify.json'
 ZARINPAL_STARTPAY = 'https://sandbox.zarinpal.com/pg/StartPay/'
-ZARINPAL_MERCHANT_ID = '123456789012345678901234567890123456'
-ZARINPAL_CALLBACK_URL = 'http://127.0.0.1:8000/shop/verify/'
+ZARINPAL_MERCHANT_ID = '9c94edb2-1357-4600-bc43-4f0def95f232'
+ZARINPAL_CALLBACK_URL = 'http://127.0.0.1:8000/payment/verify/'
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
