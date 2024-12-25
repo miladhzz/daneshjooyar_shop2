@@ -165,7 +165,7 @@ class AddToCart(FormView):
         product = get_object_or_404(Product, id=product_id)
 
         cart = Cart(self.request)
-        cart.add(product_id, product.price, quantity, update)
+        cart.add(product_id, product.get_price, quantity, update)
 
         return redirect(self.get_success_url())
 
