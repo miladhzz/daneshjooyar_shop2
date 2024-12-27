@@ -3,6 +3,7 @@ from core.models import BaseModel
 from django.conf import settings
 from shop.models import Product
 from core.models import City
+from core import OrderStatus
 
 
 class Cart(BaseModel):
@@ -14,7 +15,7 @@ class Cart(BaseModel):
 class Order(BaseModel):
     total_price = models.IntegerField()
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    status = models.BooleanField(null=True)
+    status = models.CharField(max_length=15, choices=OrderStatus.CHOICES, default=OrderStatus.PENDING_PAYMENT)
     note = models.CharField(max_length=200, blank=True)
     different_address = models.BooleanField(default=False, blank=True)
     first_name = models.CharField(max_length=50)
