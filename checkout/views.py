@@ -6,7 +6,7 @@ from accounts.models import Profile
 from django.shortcuts import render, get_object_or_404, redirect, reverse
 from core.models import Province
 from .forms import OrderForm, AddToCartForm
-from .utils import save_order_user, save_order_different, save_cart_to_db
+from .utils import save_order_user, save_order_different
 from .cart import Cart
 from shop.models import Product
 from django.urls import reverse_lazy
@@ -25,9 +25,6 @@ class Checkout(View):
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
-        cart = Cart(request)
-        save_cart_to_db(request, cart)
-
         context = {
             'provinces': Province.objects.all()
         }
