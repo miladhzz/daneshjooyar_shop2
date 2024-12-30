@@ -1,4 +1,5 @@
 from checkout.models import Order, OrderProduct
+from . import models
 
 
 def save_order_user(cart, request):
@@ -41,3 +42,24 @@ def save_order_different(cart, order_form, request):
                                     quantity=item['quantity'],
                                     price=item['price'])
     return order
+
+
+def add_cart_item_to_db(user_id, cart):
+    for item in cart:
+        cart_db, created = models.Cart.objects.get_or_create(
+            user_id=user_id,
+            product_id=item['product_id'],
+            defaults={
+                'quantity': item['quantity']
+            }
+        )
+        if not created:
+            cart_db.quantity = item['quantity']
+            cart_db.save()
+
+
+def remove_cart_item_from_db(user_id, product_id):
+    try:
+        models.Cart.objects.get(user_id=user_id, product_id=product_id).delete()
+    except models.Cart.DoesNotExist:
+        pass
