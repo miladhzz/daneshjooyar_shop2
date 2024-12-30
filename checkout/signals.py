@@ -1,8 +1,17 @@
 from django.db.models.signals import post_save
+from django.contrib.auth.signals import user_logged_in
 from django.dispatch import receiver
 from shop.models import Product
 from .models import Order, OrderProduct, Cart
 from accounts.models import User, Profile
+from .cart import Cart as SessionCart
+from .utils import add_cart_item_to_db
+
+
+@receiver(user_logged_in)
+def save_cart_to_db(sender, request, user, **kwargs):
+    cart = SessionCart(request)
+    add_cart_item_to_db(user.id, cart)
 
 
 @receiver(post_save, sender=Product)
