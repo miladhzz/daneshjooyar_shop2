@@ -10,6 +10,7 @@ class Cart(BaseModel):
     quantity = models.PositiveIntegerField()
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    session_key = models.CharField(max_length=100, default='')
 
 
 class Order(BaseModel):

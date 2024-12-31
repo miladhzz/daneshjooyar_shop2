@@ -8,10 +8,18 @@ from .cart import Cart as SessionCart
 from .utils import add_cart_item_to_db
 
 
-@receiver(user_logged_in)
-def save_cart_to_db(sender, request, user, **kwargs):
-    cart = SessionCart(request)
-    add_cart_item_to_db(user.id, cart)
+# @receiver(user_logged_in)
+# def sync_session_with_db(sender, request, user, **kwargs):
+#     cart = SessionCart(request)
+#
+#     db_carts = Cart.objects.filter(user=user)
+#     for item in db_carts:
+#         cart.add(product_id=item.product.id,
+#                  product_price=item.product.price,
+#                  quantity=item.quantity,
+#                  update=False)
+#
+#     add_cart_item_to_db(user.id, cart)
 
 
 @receiver(post_save, sender=Product)

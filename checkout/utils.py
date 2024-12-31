@@ -60,6 +60,45 @@ def add_cart_item_to_db(user_id, cart):
 
 def remove_cart_item_from_db(user_id, product_id):
     try:
-        models.Cart.objects.get(user_id=user_id, product_id=product_id).delete()
+        models.Cartobjects.get(user_id=user_id, product_id=product_id).delete()
     except models.Cart.DoesNotExist:
         pass
+
+
+def sync_cart_session_to_db(request, cart):
+    user_id = request.user.id
+    session_key = request.session.session_key
+
+    models.Cart.objects.filter(user_id=user_id).exclude(product_id__in=cart.product_ids).delete()
+
+    for item in cart:
+        cart_db, created = models.Cart.objects.get_or_create(
+            user_id=user_id,
+            product_id=item['product_id'],
+            defaults={
+                'quantity': item['quantity'],
+                'session_key': session_key
+            }
+        )
+        if not created:
+            cart_db.quantity = item['quantity']
+            cart_db.session_key = session_key
+            cart_db.save()
+
+
+def sync_cart_db_to_session(request, cart):
+    user_id = request.user.id
+    session_key = request.session.session_key
+
+    if models.Cart.objects.filter(user_id=user_id, session_key=session_key).exists():
+        return
+
+    cart_items = models.Cart.objects.filter(user_id=user_id)
+    for item in cart_items:
+        item.session_key = session_key
+        cart.add(product_id=item.product.id,
+                 product_price=item.product.price,
+                 quantity=item.quantity,
+                 update=False)
+
+    models.Cart.objects.bulk_update(cart_items, ['session_key'])

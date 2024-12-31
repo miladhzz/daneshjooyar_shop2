@@ -1,11 +1,15 @@
 from .cart import Cart
 from shop.models import Product
 from decimal import Decimal
+from .utils import sync_cart_db_to_session
 
 
 def cart(request):
     cart_session = Cart(request)
     if cart_session:
+        if request.user.is_authenticated:
+            sync_cart_db_to_session(request, cart_session)
+
         product_ids = cart_session.product_ids
         products = Product.objects.filter(id__in=product_ids)
         for product in products:
