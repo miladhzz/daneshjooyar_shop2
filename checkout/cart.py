@@ -52,8 +52,6 @@ class SessionCart:
     def __save(self):
         self.session[CART_SESSION_ID] = self.cart
         self.session.modified = True
-        # if self.request.user.is_authenticated:
-        #     sync_cart_session_to_db(self.request, self)
 
     def clear(self):
         self.session[CART_SESSION_ID] = {}
@@ -61,9 +59,11 @@ class SessionCart:
 
 
 class DbCart:
+
     def __init__(self, request):
         self.session = request.session
         self.request = request
+        self.total_price = None
 
     @property
     def product_ids(self):
@@ -73,10 +73,11 @@ class DbCart:
     @property
     def get_total_price(self):
         user_id = self.request.user.id
-        return sum(item.get_price * item.quantity for item in models.Cart.objects.filter(user_id=user_id))
+        return sum(item.product.get_price * item.quantity for item in models.Cart.objects.filter(user_id=user_id))
 
     def __getitem__(self, item):
-        return self.cart[item]
+        user_id = self.request.user.id
+        return models.Cart.objects.get(user_id=user_id, product_id=item)
 
     def __iter__(self):
         user_id = self.request.user.id
