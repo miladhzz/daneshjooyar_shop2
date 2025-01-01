@@ -3,7 +3,7 @@ from .utils import sync_cart_session_to_db
 CART_SESSION_ID = 'cart'
 
 
-class Cart:
+class SessionCart:
     def __init__(self, request):
         self.session = request.session
         self.request = request
@@ -52,9 +52,18 @@ class Cart:
     def __save(self):
         self.session[CART_SESSION_ID] = self.cart
         self.session.modified = True
-        if self.request.user.is_authenticated:
-            sync_cart_session_to_db(self.request, self)
+        # if self.request.user.is_authenticated:
+        #     sync_cart_session_to_db(self.request, self)
 
     def clear(self):
         self.session[CART_SESSION_ID] = {}
         self.session.modified = True
+
+
+class Cart:
+    @staticmethod
+    def get_cart(request):
+        if request.user.is_authenticated:
+            return SessionCart(request)
+        else:
+            return SessionCart(request)
