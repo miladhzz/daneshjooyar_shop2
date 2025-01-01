@@ -1,5 +1,5 @@
 from .utils import sync_cart_session_to_db
-
+from . import models
 CART_SESSION_ID = 'cart'
 
 
@@ -60,10 +60,59 @@ class SessionCart:
         self.session.modified = True
 
 
+class DbCart:
+    def __init__(self, request):
+        self.session = request.session
+        self.request = request
+
+    @property
+    def product_ids(self):
+        user_id = self.request.user.id
+        return models.Cart.objects.filter(user_id=user_id).values('product_id')
+
+    @property
+    def get_total_price(self):
+        user_id = self.request.user.id
+        return sum(item.get_price * item.quantity for item in models.Cart.objects.filter(user_id=user_id))
+
+    def __getitem__(self, item):
+        return self.cart[item]
+
+    def __iter__(self):
+        user_id = self.request.user.id
+        for item in models.Cart.objects.filter(user_id=user_id):
+            yield item
+
+    def add(self, product_id, product_price, quantity, update):
+        user_id = self.request.user.id
+        session_key = self.request.session.session_key
+
+        cart_db, created = models.Cart.objects.get_or_create(
+            user_id=user_id,
+            product_id=product_id,
+            defaults={
+                'quantity': quantity,
+                'session_key': session_key
+            }
+        )
+        if not created:
+            cart_db.quantity = quantity
+            cart_db.session_key = session_key
+            cart_db.save()
+
+    def remove(self, product_id):
+        user_id = self.request.user.id
+        models.Cart.objects.filter(user_id=user_id, product_id=product_id).delete()
+
+    def clear(self):
+        user_id = self.request.user.id
+        models.Cart.objects.filter(user_id=user_id).delete()
+
+
 class Cart:
     @staticmethod
     def get_cart(request):
         if request.user.is_authenticated:
-            return SessionCart(request)
+            return DbCart(request)
         else:
             return SessionCart(request)
