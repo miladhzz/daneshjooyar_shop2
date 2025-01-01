@@ -79,10 +79,20 @@ class DbCart:
         user_id = self.request.user.id
         return models.Cart.objects.get(user_id=user_id, product_id=item)
 
+    # def __iter__(self):
+    #     user_id = self.request.user.id
+    #     for item in models.Cart.objects.filter(user_id=user_id):
+    #         yield item
+
     def __iter__(self):
         user_id = self.request.user.id
         for item in models.Cart.objects.filter(user_id=user_id):
-            yield item
+            yield {
+                'product_id': item.product.id,
+                'quantity': item.quantity,
+                'price': item.product.get_price,
+                'product': item.product
+            }
 
     def add(self, product_id, product_price, quantity, update):
         user_id = self.request.user.id
