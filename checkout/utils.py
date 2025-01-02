@@ -2,11 +2,12 @@ from checkout.models import Order, OrderProduct
 from . import models
 
 
-def save_order_user(cart, request):
+def save_order_user(cart, request, discount):
     order = Order.objects.create(
         user=request.user,
         total_price=cart.get_total_price,
         note=request.POST.get('note'),
+        discount_code=request.POST.get('discount_code'),
         different_address=False,
         first_name=request.user.first_name,
         last_name=request.user.last_name,
@@ -23,11 +24,12 @@ def save_order_user(cart, request):
     return order
 
 
-def save_order_different(cart, order_form, request):
+def save_order_different(cart, order_form, request, discount):
     order = Order.objects.create(
         user=request.user,
         total_price=cart.get_total_price,
         note=request.POST.get('note'),
+        discount_code=request.POST.get('discount_code'),
         different_address=True,
         first_name=order_form.cleaned_data['first_name'],
         last_name=order_form.cleaned_data['last_name'],
@@ -43,3 +45,8 @@ def save_order_different(cart, order_form, request):
                                     price=item['price'])
     return order
 
+
+def get_discount(request, cart):
+    discount_code = request.POST.get('discount_code')
+    if not discount_code:
+        return

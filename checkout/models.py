@@ -14,7 +14,7 @@ class Cart(BaseModel):
 
 class Order(BaseModel):
     total_price = models.IntegerField()
-    discount_code = models.CharField(max_length=255)
+    discount_code = models.CharField(max_length=255, null=True)
     discount_id = models.IntegerField(null=True)
     total_discount = models.IntegerField(default=0)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)

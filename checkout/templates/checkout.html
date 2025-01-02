@@ -96,8 +96,8 @@
                             <div>
                                 <div><strong>Discount Code</strong></div>
                                 Code:
-                                <input type="hidden" name="order_price" id="order_price" value="{{ cart.get_total_price }}"/>
-                                <input type="text" name="discount_code" id="discount_code"/>
+                                <input type="hidden" id="order_price" value="{{ cart.get_total_price }}"/>
+                                <input type="text" id="discount_code"/>
                                 <input type="submit" value="Apply" id="discount_button"/>
                             </div>
 							<div class="order-col">
@@ -151,6 +151,7 @@
                             </div>
                             <!-- /Shiping Details -->
                             {% csrf_token %}
+                            <input type="hidden" name="discount_code" value="">
                             <!-- Order notes -->
                             <div class="order-notes">
                                 <textarea class="input" name="note" placeholder="Order Notes"></textarea>
@@ -230,11 +231,10 @@
                     },
                     success: function(response) {
                         $('#discount_button').hide();
-
                         $('#order_total_price .order-total').text(response.new_price);
-
                         var newPriceLabel = $('<label></label>').text('Discount: ' + response.discount_price);
                         $('#discount_button').after(newPriceLabel);
+                        $('input[name="discount_code"]').val(discountCode);
                     },
                     error: function(xhr, status, error) {
                         console.error(error);

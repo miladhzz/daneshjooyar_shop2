@@ -6,7 +6,7 @@ from accounts.models import Profile
 from django.shortcuts import render, get_object_or_404, redirect, reverse
 from core.models import Province
 from .forms import OrderForm, AddToCartForm
-from .utils import save_order_user, save_order_different
+from .utils import save_order_user, save_order_different, get_discount
 from .cart import Cart
 from shop.models import Product
 from django.urls import reverse_lazy
@@ -35,18 +35,20 @@ class Checkout(View):
     def post(self, request, *args, **kwargs):
         cart = Cart.get_cart(request)
 
+        discount = get_discount(request, cart)
+
         different_address = request.POST.get('different_address')
 
         if different_address:
             order_form = OrderForm(request.POST)
             if not order_form.is_valid():
                 return render(request, "checkout.html")
-            order = save_order_different(cart, order_form, request)
+            order = save_order_different(cart, order_form, request, discount)
             cart.clear()
             return redirect(reverse('payment:to_bank', args=[order.id]))
 
         # not different_address:
-        order = save_order_user(cart, request)
+        order = save_order_user(cart, request, discount)
         cart.clear()
         return redirect(reverse('payment:to_bank', args=[order.id]))
 
