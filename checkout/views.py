@@ -80,3 +80,12 @@ class RemoveFromCart(View):
             return redirect(reverse('checkout:cart_detail'))
 
         raise Http404('product is not found.')
+
+
+from django.http import JsonResponse
+
+def apply_discount(request):
+    order_total_price = float(request.GET.get('order_price', 0))
+    new_price = order_total_price * 2
+    discount_price = 500
+    return JsonResponse({'new_price': new_price, 'discount_price': discount_price})

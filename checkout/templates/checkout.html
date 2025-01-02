@@ -85,7 +85,7 @@
                                 {% for item in cart %}
 								<div class="order-col">
 									<div>{{ item.quantity }}x {{ item.product.title }}</div>
-									<div>${{ item.product.price }}</div>
+									<div>{{ item.product.price }}</div>
 								</div>
                                 {% endfor %}
 							</div>
@@ -93,9 +93,16 @@
 								<div>Shiping</div>
 								<div><strong>FREE</strong></div>
 							</div>
+                            <div>
+                                <div><strong>Discount Code</strong></div>
+                                Code:
+                                <input type="hidden" name="order_price" id="order_price" value="{{ cart.get_total_price }}"/>
+                                <input type="text" name="discount_code" id="discount_code"/>
+                                <input type="submit" value="Apply" id="discount_button"/>
+                            </div>
 							<div class="order-col">
 								<div><strong>TOTAL</strong></div>
-								<div><strong class="order-total">${{ cart.get_total_price }}</strong></div>
+								<div id="order_total_price"><strong class="order-total">{{ cart.get_total_price }}</strong></div>
 							</div>
 						</div>
                         <form method="post">
@@ -204,6 +211,34 @@
                         $.map(data, function(item){
                             $('#city').append('<option value="'+ item.id +'">'+ item.title +'</option>');
                         });
+                    }
+                });
+            });
+
+//--------------discount--------------------
+            $('#discount_button').click(function(e) {
+                e.preventDefault();
+                var orderPrice = $('#order_price').val();
+                var discountCode = $('#discount_code').val();
+
+                $.ajax({
+                    type: 'GET',
+                    url: '{% url "checkout:apply_discount" %}',
+                    data: {
+                        'order_price': orderPrice,
+                        'discount_code': discountCode
+                    },
+                    success: function(response) {
+                        $('#discount_button').hide();
+
+                        $('#order_total_price .order-total').text(response.new_price);
+
+                        // اضافه کردن label
+                        var newPriceLabel = $('<label></label>').text('Discount: ' + response.discount_price);
+                        $('#discount_button').after(newPriceLabel);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(error);
                     }
                 });
             });
