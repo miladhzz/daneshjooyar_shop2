@@ -7,12 +7,12 @@ from .utils import sync_cart_db_to_session
 def cart(request):
     session_cart = Cart.get_cart(request)
     if session_cart:
-        product_ids = session_cart.product_ids
-        products = Product.objects.filter(id__in=product_ids)
-        for product in products:
-            if request.user.is_authenticated:
-                break
-            session_cart[str(product.id)]['product'] = product
+
+        if not request.user.is_authenticated:
+            product_ids = session_cart.product_ids
+            products = Product.objects.filter(id__in=product_ids)
+            for product in products:
+                session_cart[str(product.id)]['product'] = product
 
         all_total_price = 0
         cart_length = 0
