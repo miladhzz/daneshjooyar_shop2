@@ -65,24 +65,10 @@ class DbCart:
         self.request = request
         self.total_price = 0
 
-    # @property
-    # def product_ids(self):
-    #     user_id = self.request.user.id
-    #     return models.Cart.objects.filter(user_id=user_id).values('product_id')
-
     @property
     def get_total_price(self):
         user_id = self.request.user.id
         return sum(item.product.get_price * item.quantity for item in models.Cart.objects.filter(user_id=user_id))
-
-    # def __getitem__(self, item):
-    #     user_id = self.request.user.id
-    #     return models.Cart.objects.get(user_id=user_id, product_id=item)
-
-    # def __iter__(self):
-    #     user_id = self.request.user.id
-    #     for item in models.Cart.objects.filter(user_id=user_id):
-    #         yield item
 
     def __iter__(self):
         user_id = self.request.user.id
