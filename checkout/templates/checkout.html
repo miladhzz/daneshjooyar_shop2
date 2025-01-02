@@ -218,8 +218,8 @@
             //--------------discount--------------------//
             $('#discount_button').click(function(e) {
                 e.preventDefault();
-                var orderPrice = $('#order_price').val();
-                var discountCode = $('#discount_code').val();
+                let orderPrice = $('#order_price').val();
+                let discountCode = $('#discount_code').val();
 
                 $.ajax({
                     type: 'GET',
