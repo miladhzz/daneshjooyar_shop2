@@ -61,18 +61,15 @@ class SessionCart:
 class DbCart:
 
     def __init__(self, request):
-        self.session = request.session
-        self.request = request
+        self.user_id = request.user.id
         self.total_price = 0
 
     @property
     def get_total_price(self):
-        user_id = self.request.user.id
-        return sum(item.product.get_price * item.quantity for item in models.Cart.objects.filter(user_id=user_id))
+        return sum(item.product.get_price * item.quantity for item in models.Cart.objects.filter(user_id=self.user_id))
 
     def __iter__(self):
-        user_id = self.request.user.id
-        for item in models.Cart.objects.filter(user_id=user_id):
+        for item in models.Cart.objects.filter(user_id=self.user_id):
             yield {
                 'product_id': item.product.id,
                 'quantity': item.quantity,
@@ -81,29 +78,22 @@ class DbCart:
             }
 
     def add(self, product_id, product_price, quantity, update):
-        user_id = self.request.user.id
-        session_key = self.request.session.session_key
-
         cart_db, created = models.Cart.objects.get_or_create(
-            user_id=user_id,
+            user_id=self.user_id,
             product_id=product_id,
             defaults={
                 'quantity': quantity,
-                'session_key': session_key
             }
         )
         if not created:
             cart_db.quantity = quantity if update else cart_db.quantity + quantity
-            cart_db.session_key = session_key
             cart_db.save()
 
     def remove(self, product_id):
-        user_id = self.request.user.id
-        models.Cart.objects.filter(user_id=user_id, product_id=product_id).delete()
+        models.Cart.objects.filter(user_id=self.user_id, product_id=product_id).delete()
 
     def clear(self):
-        user_id = self.request.user.id
-        models.Cart.objects.filter(user_id=user_id).delete()
+        models.Cart.objects.filter(user_id=self.user_id).delete()
 
 
 class Cart:
