@@ -11,6 +11,8 @@ from .cart import Cart
 from shop.models import Product
 from django.urls import reverse_lazy
 from django.http import Http404
+from django.http import JsonResponse
+from discount.models import DiscountCode
 
 
 class Checkout(View):
@@ -82,10 +84,18 @@ class RemoveFromCart(View):
         raise Http404('product is not found.')
 
 
-from django.http import JsonResponse
-
+@login_required
 def apply_discount(request):
-    order_total_price = float(request.GET.get('order_price', 0))
-    new_price = order_total_price * 2
-    discount_price = 500
+    order_price = int(request.GET.get('order_price', 0))
+    discount_code = (request.GET.get('discount_code', ""))
+
+    new_price = order_price
+    discount_price = 0
+    try:
+        discount = DiscountCode.objects.get(code=discount_code)
+        new_price = discount.get_discount(order_price)
+        discount_price = order_price - new_price
+    except DiscountCode.DoesNotExist:
+        pass
+
     return JsonResponse({'new_price': new_price, 'discount_price': discount_price})
