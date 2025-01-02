@@ -1,5 +1,6 @@
-from .utils import sync_cart_session_to_db
 from . import models
+
+
 CART_SESSION_ID = 'cart'
 
 
