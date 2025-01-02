@@ -215,7 +215,7 @@
                 });
             });
 
-//--------------discount--------------------
+            //--------------discount--------------------//
             $('#discount_button').click(function(e) {
                 e.preventDefault();
                 var orderPrice = $('#order_price').val();
@@ -233,7 +233,6 @@
 
                         $('#order_total_price .order-total').text(response.new_price);
 
-                        // اضافه کردن label
                         var newPriceLabel = $('<label></label>').text('Discount: ' + response.discount_price);
                         $('#discount_button').after(newPriceLabel);
                     },
@@ -242,6 +241,7 @@
                     }
                 });
             });
+            //--------------end discount--------------------//
         });
     </script>
 {% endblock scripts %}
