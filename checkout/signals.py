@@ -20,7 +20,6 @@ def sync_session_with_db(sender, request, user, **kwargs):
                 'quantity': item['quantity']
             }
         )
-    # بقیه ش که اتوماتیک از دیتابیس استفاده میکنه
 
 @receiver(post_save, sender=Product)
 def soft_delete_cart(sender, instance, created, **kwargs):
