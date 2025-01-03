@@ -1,13 +1,17 @@
 from checkout.models import Order, OrderProduct
 from . import models
+from discount.models import DiscountCode
 
 
-def save_order_user(cart, request, discount):
+def save_order_user(cart, request):
+    discount = get_discount(request, cart)
     order = Order.objects.create(
         user=request.user,
-        total_price=cart.get_total_price,
         note=request.POST.get('note'),
-        discount_code=request.POST.get('discount_code'),
+        total_price=discount.get('total_price'),
+        discount_id=discount.get('discount_id'),
+        discount_code=discount.get('discount_code'),
+        total_discount=discount.get('total_discount'),
         different_address=False,
         first_name=request.user.first_name,
         last_name=request.user.last_name,
@@ -24,12 +28,15 @@ def save_order_user(cart, request, discount):
     return order
 
 
-def save_order_different(cart, order_form, request, discount):
+def save_order_different(cart, order_form, request):
+    discount = get_discount(request, cart)
     order = Order.objects.create(
         user=request.user,
-        total_price=cart.get_total_price,
         note=request.POST.get('note'),
-        discount_code=request.POST.get('discount_code'),
+        total_price=discount.get('total_price'),
+        discount_id=discount.get('discount_id'),
+        discount_code=discount.get('discount_code'),
+        total_discount=discount.get('total_discount'),
         different_address=True,
         first_name=order_form.cleaned_data['first_name'],
         last_name=order_form.cleaned_data['last_name'],
@@ -48,5 +55,23 @@ def save_order_different(cart, order_form, request, discount):
 
 def get_discount(request, cart):
     discount_code = request.POST.get('discount_code')
+    order_price = cart.get_total_price
+
+    result = {
+        'total_price': order_price,
+        'total_discount': 0,
+        'discount_id': None,
+        'discount_code': discount_code
+    }
     if not discount_code:
-        return
+        return result
+
+    try:
+        discount = DiscountCode.objects.get(code=discount_code)
+        result['discount_id'] = discount.id
+        result['total_price'] = new_price = discount.get_discount(order_price)
+        result['total_discount'] = order_price - new_price
+    except DiscountCode.DoesNotExist:
+        pass
+
+    return result

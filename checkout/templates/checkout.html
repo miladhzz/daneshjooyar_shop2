@@ -232,7 +232,7 @@
                     success: function(response) {
                         $('#discount_button').hide();
                         $('#order_total_price .order-total').text(response.new_price);
-                        var newPriceLabel = $('<label></label>').text('Discount: ' + response.discount_price);
+                        var newPriceLabel = $('<label></label>').text('Discount: ' + response.total_discount);
                         $('#discount_button').after(newPriceLabel);
                         $('input[name="discount_code"]').val(discountCode);
                     },
