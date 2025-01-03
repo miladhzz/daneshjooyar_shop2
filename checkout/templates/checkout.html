@@ -224,7 +224,7 @@
 
                 $.ajax({
                     type: 'GET',
-                    url: '{% url "checkout:apply_discount" %}',
+                    url: '{% url "discount:apply_discount" %}',
                     data: {
                         'order_price': orderPrice,
                         'discount_code': discountCode
