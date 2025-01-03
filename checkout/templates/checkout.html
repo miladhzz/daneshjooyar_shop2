@@ -85,7 +85,7 @@
                                 {% for item in cart %}
 								<div class="order-col">
 									<div>{{ item.quantity }}x {{ item.product.title }}</div>
-									<div>${{ item.product.price }}</div>
+									<div>{{ item.product.get_price }}</div>
 								</div>
                                 {% endfor %}
 							</div>
@@ -93,9 +93,16 @@
 								<div>Shiping</div>
 								<div><strong>FREE</strong></div>
 							</div>
+                            <div>
+                                <div><strong>Discount Code</strong></div>
+                                Code:
+                                <input type="hidden" id="order_price" value="{{ cart.get_total_price }}">
+                                <input type="text" id="discount_code" />
+                                <input type="submit" value="Apply" id="discount_button">
+                            </div>
 							<div class="order-col">
 								<div><strong>TOTAL</strong></div>
-								<div><strong class="order-total">${{ cart.get_total_price }}</strong></div>
+								<div><strong class="order-total" id="order_total_price">{{ cart.get_total_price }}</strong></div>
 							</div>
 						</div>
                         <form method="post">
@@ -204,6 +211,28 @@
                         $.map(data, function(item){
                             $('#city').append('<option value="'+ item.id +'">'+ item.title +'</option>');
                         });
+                    }
+                });
+            });
+
+            //---------------------apply discount-----------------//
+            $('#discount_button').click(function(e){
+                e.preventDefault();
+                let orderPrice = $('#order_price').val();
+                let discountCode = $('#discount_code').val();
+
+                $.ajax({
+                    type: 'GET',
+                    url: '{% url "discount:apply_discount" %}',
+                    dataType: "json",
+                    data: {
+                        'order_price': orderPrice,
+                        'discount_code': discountCode
+                    },
+                    success: function(data){
+                        let resultLabel = $('<label></label>').text('Discount: ' + data.total_discount);
+                        $('#discount_button').after(resultLabel);
+                        $('#order_total_price').text(data.new_price);
                     }
                 });
             });

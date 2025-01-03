@@ -40,3 +40,9 @@ class DiscountCode(BaseModel):
     def __str__(self):
         return self.name
 
+    def get_discount(self, price):
+        if self.discount_code_type == DiscountType.FIXED:
+            return max(price - self.discount_code_value, 0)
+
+        percent = int(price * (self.discount_code_value / 100))
+        return max(price - percent, 0)
