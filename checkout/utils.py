@@ -1,6 +1,5 @@
 from checkout.models import Order, OrderProduct
-from . import models
-from discount.models import DiscountCode
+from discount.utils import get_discount
 
 
 def save_order_user(cart, request):
@@ -52,26 +51,3 @@ def save_order_different(cart, order_form, request):
                                     price=item['price'])
     return order
 
-
-def get_discount(request, cart):
-    discount_code = request.POST.get('discount_code')
-    order_price = cart.get_total_price
-
-    result = {
-        'total_price': order_price,
-        'total_discount': 0,
-        'discount_id': None,
-        'discount_code': discount_code
-    }
-    if not discount_code:
-        return result
-
-    try:
-        discount = DiscountCode.objects.get(code=discount_code)
-        result['discount_id'] = discount.id
-        result['total_price'] = new_price = discount.get_discount(order_price)
-        result['total_discount'] = order_price - new_price
-    except DiscountCode.DoesNotExist:
-        pass
-
-    return result
