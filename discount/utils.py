@@ -1,4 +1,4 @@
-from .models import SpecialPrice
+from .models import SpecialPrice, DiscountCode
 from core import DiscountType
 from django.db.models import Q
 
@@ -28,3 +28,28 @@ def get_special_price(product):
             max_special['percent_type'] = special_type
 
     return max_special
+
+
+def get_discount(request, cart):
+    discount_code = request.POST.get('discount_code')
+    order_price = cart.get_total_price
+
+    result = {
+        'total_price': order_price,
+        'discount_code': discount_code,
+        'discount_id': None,
+        'total_discount': 0
+    }
+
+    if not discount_code:
+        return result
+
+    try:
+        discount = DiscountCode.objects.active().get(code=discount_code)
+        result['discount_id'] = discount.id
+        result['total_price'] = new_price = discount.get_discount(order_price)
+        result['total_discount'] = order_price - new_price
+    except DiscountCode.DoesNotExist:
+        pass
+
+    return result

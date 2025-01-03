@@ -1,7 +1,9 @@
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from .models import DiscountCode
 
 
+@login_required
 def apply_discount(request):
     order_price = int(request.GET.get('order_price', 0))
     discount_code = request.GET.get('discount_code', "")

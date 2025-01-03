@@ -151,6 +151,7 @@
                             </div>
                             <!-- /Shiping Details -->
                             {% csrf_token %}
+                            <input type="hidden" name="discount_code">
                             <!-- Order notes -->
                             <div class="order-notes">
                                 <textarea class="input" name="note" placeholder="Order Notes"></textarea>
@@ -233,6 +234,7 @@
                         let resultLabel = $('<label></label>').text('Discount: ' + data.total_discount);
                         $('#discount_button').after(resultLabel);
                         $('#order_total_price').text(data.new_price);
+                        $('input[name="discount_code"]').val(discountCode);
                     }
                 });
             });
