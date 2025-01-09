@@ -1,8 +1,24 @@
 from django.db.models.signals import post_save
+from django.contrib.auth.signals import user_logged_in
 from django.dispatch import receiver
 from shop.models import Product
 from .models import Order, OrderProduct, Cart
 from accounts.models import User, Profile
+from .cart import SessionCart
+
+
+@receiver(user_logged_in)
+def sync_session_with_db(sender, request, user, **kwargs):
+    cart = SessionCart(request)
+
+    for item in cart:
+        Cart.objects.get_or_create(
+            user_id=user.id,
+            product_id=item['product_id'],
+            defaults={
+                'quantity': item['quantity']
+            }
+        )
 
 
 @receiver(post_save, sender=Product)
