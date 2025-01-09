@@ -31,7 +31,7 @@ class Checkout(View):
         return render(request, "checkout.html", context=context)
 
     def post(self, request, *args, **kwargs):
-        cart = Cart(request)
+        cart = Cart.get_cart(request)
 
         different_address = request.POST.get('different_address')
 
@@ -61,7 +61,7 @@ class AddToCart(FormView):
 
         product = get_object_or_404(Product, id=product_id)
 
-        cart = Cart(self.request)
+        cart = Cart.get_cart(self.request)
         cart.add(product_id, product.get_price, quantity, update)
 
         return redirect(self.get_success_url())
@@ -75,7 +75,7 @@ class RemoveFromCart(View):
     def get(self, request, *args, **kwargs):
         product_id = kwargs.get('product_id')
         if Product.objects.filter(id=product_id).exists():
-            cart = Cart(request)
+            cart = Cart.get_cart(self.request)
             cart.remove(str(product_id))
             return redirect(reverse('checkout:cart_detail'))
 
