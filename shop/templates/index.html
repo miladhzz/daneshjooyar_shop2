@@ -120,9 +120,15 @@
                                                         <button class="quick-view"><i class="fa fa-eye"></i><span class="tooltipp">quick view</span></button>
                                                     </div>
                                                 </div>
+                                                <form method="post" action="{% url 'checkout:add_to_cart' %}">
+                                                    <input type="hidden" name="product_id" value="{{ product.id }}">
+                                                    <input type="hidden" name="quantity" value="1">
+                                                    <input type="hidden" name="update" value="0">
+                                                    {% csrf_token %}
                                                 <div class="add-to-cart">
                                                     <button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> add to cart</button>
                                                 </div>
+                                                </form>
                                             </div>
                                             <!-- /product -->
                                         {% endfor %}
