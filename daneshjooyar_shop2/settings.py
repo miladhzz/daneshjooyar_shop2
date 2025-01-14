@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'discount',
     'payment',
     'accounts',
+    # packages
+    'captcha',
 ]
 
 MIDDLEWARE = [
