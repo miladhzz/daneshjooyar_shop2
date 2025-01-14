@@ -1,6 +1,7 @@
 import random
 from django.core.cache import cache
 from django.core.mail import send_mail
+from captcha.conf import settings
 
 
 def send_otp(mobile):
@@ -17,3 +18,11 @@ def send_activation_code(activation_url, email_address):
         from_email='admin@admin.com',
         recipient_list=[email_address]
     )
+
+
+def random_char_challenge():
+    chars, ret = "abcdefghjkmnprstuvwxyz23456789", ""
+    for i in range(settings.CAPTCHA_LENGTH):
+        ret += random.choice(chars)
+    return ret.upper(), ret
+

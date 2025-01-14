@@ -153,3 +153,6 @@ AUTHENTICATION_BACKENDS = [
     'accounts.backends.EmailBackend',
     'accounts.backends.MobileBackend'
 ]
+
+CAPTCHA_LENGTH = 5
+CAPTCHA_CHALLENGE_FUNCT = 'accounts.utility.random_char_challenge'

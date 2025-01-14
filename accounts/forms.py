@@ -1,11 +1,13 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from accounts.models import User
+from captcha.fields import CaptchaField
 
 
 class LoginForm(forms.Form):
     username = forms.CharField(max_length=50)
     password = forms.CharField(max_length=50, widget=forms.PasswordInput)
+    captcha = CaptchaField()
 
 
 class EmailLoginForm(forms.Form):
