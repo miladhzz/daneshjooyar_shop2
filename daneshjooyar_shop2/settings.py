@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'discount',
     'payment',
     'accounts',
+    # packages
+    'django_recaptcha',
 ]
 
 MIDDLEWARE = [
@@ -151,3 +153,7 @@ AUTHENTICATION_BACKENDS = [
     'accounts.backends.EmailBackend',
     'accounts.backends.MobileBackend'
 ]
+
+
+RECAPTCHA_PUBLIC_KEY = '6LfPXLcqAAAAAEZwyYt9EjRwVFFxZsNn0FAMlDP4'
+RECAPTCHA_PRIVATE_KEY = '6LfPXLcqAAAAAARvVcOCiadGkFK0DiYHH2NnsRCd'
