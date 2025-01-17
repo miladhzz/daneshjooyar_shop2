@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sitemaps',
+    'django.contrib.sites',
     # local apps
     'core',
     'website',
@@ -151,3 +153,5 @@ AUTHENTICATION_BACKENDS = [
     'accounts.backends.EmailBackend',
     'accounts.backends.MobileBackend'
 ]
+
+SITE_ID = 1
