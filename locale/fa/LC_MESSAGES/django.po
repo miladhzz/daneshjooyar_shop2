@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-03 19:08+0330\n"
+"POT-Creation-Date: 2025-02-04 02:08+0330\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -38,19 +38,23 @@ msgstr ""
 msgid "Is email verified"
 msgstr "ایمیل تایید شده است"
 
-#: .\accounts\templates\login.html:6 .\accounts\templates\login.html:10
+#: .\accounts\templates\login.html:9 .\accounts\templates\login.html:14
+msgid "Welcome to our page"
+msgstr "به سایت ما خوش آمدید"
+
+#: .\accounts\templates\login.html:17 .\accounts\templates\login.html:21
 msgid "Login"
 msgstr "ورود"
 
-#: .\accounts\templates\login.html:11
+#: .\accounts\templates\login.html:22
 msgid "Register"
 msgstr "ثبت نام"
 
-#: .\accounts\templates\login.html:21
+#: .\accounts\templates\login.html:32
 msgid "Mobile Login"
 msgstr "ورود با موبایل"
 
-#: .\accounts\templates\login.html:22
+#: .\accounts\templates\login.html:33
 msgid "Email Login"
 msgstr "ورود با ایمیل"
 
