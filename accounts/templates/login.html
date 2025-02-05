@@ -1,14 +1,14 @@
 {% extends "base.html" %}
-{% load static %}
-{% block title %}Login{% endblock title %}
+{% load i18n static %}
+{% block title %}{% translate 'Login' %}{% endblock title %}
 {% block content %}
 <div class="container">
-    <h1>Login</h1>
+    <h1>{% translate 'Login' %}</h1>
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <input type="submit" value="Login">
-        <a href="{% url 'accounts:register' %}">Register</a>
+        <input type="submit" value="{% translate 'Login' %}">
+        <a href="{% url 'accounts:register' %}">{% translate 'Register' %}</a>
     </form>
     {% if messages %}
         {% for message in messages %}
@@ -18,7 +18,7 @@
         {% endfor %}
     {% endif %}
     <hr />
-    <a href="{% url 'accounts:mobile_login' %}">Mobile Login </a>
-    <a href="{% url 'accounts:email_login' %}"> Email Login</a>
+    <a href="{% url 'accounts:mobile_login' %}">{% translate 'Mobile Login' %} </a>
+    <a href="{% url 'accounts:email_login' %}">{% translate 'Email Login' %}</a>
 </div>
 {% endblock content %}

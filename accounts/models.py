@@ -11,11 +11,11 @@ class SoftUserManager(UserManager):
 
 
 class User(AbstractUser):
-    mobile = models.CharField(max_length=11, unique=True)
+    mobile = models.CharField(_("mobile"), max_length=11, unique=True)
     email = models.EmailField(_("email address"), unique=True)
     deleted = models.BooleanField(default=False, editable=False)
     updated_at = models.DateTimeField(auto_now=True)
-    is_email_verified = models.BooleanField(default=False)
+    is_email_verified = models.BooleanField(_("is email verified"), default=False)
 
     objects = SoftUserManager()
 
