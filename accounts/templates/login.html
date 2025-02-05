@@ -3,6 +3,18 @@
 {% block title %}{% translate 'Login' %}{% endblock title %}
 {% block content %}
 <div class="container">
+    <form method="post" action="{% url 'set_language' %}">
+        {% csrf_token %}
+        <input type="hidden" name="language" value="fa">
+        <button type="submit">فارسی</button>
+    </form>
+
+    <form method="post" action="{% url 'set_language' %}">
+        {% csrf_token %}
+        <input type="hidden" name="language" value="en">
+        <button type="submit">English</button>
+    </form>
+
     <h1>{% translate 'Login' %}</h1>
     <form method="post">
         {% csrf_token %}
