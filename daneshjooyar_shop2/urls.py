@@ -14,7 +14,6 @@ sitemaps = {
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # path('', include("website.urls", namespace="website")),
     path('', include("shop.urls", namespace="shop")),
     path('checkout/', include("checkout.urls", namespace="checkout")),
     path('discount/', include("discount.urls", namespace="discount")),
@@ -32,5 +31,5 @@ urlpatterns = [
           {"sitemaps": sitemaps},
           name="django.contrib.sitemaps.views.sitemap",
       ),
-    path("i18n/", include(("django.conf.urls.i18n", "i18n"))),
+    path("i18n/", include("django.conf.urls.i18n")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
