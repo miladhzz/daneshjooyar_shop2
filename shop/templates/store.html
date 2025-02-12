@@ -275,13 +275,13 @@
 										</div>
 									</div>
                                     <form method="post" action="{% url 'checkout:add_to_cart' %}">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="quantity" value="1">
                                         <input type="hidden" name="product_id" value="{{ product.id }}">
+                                        <input type="hidden" name="quantity" value="1">
                                         <input type="hidden" name="update" value="0">
-                                        <div class="add-to-cart">
-                                            <button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> add to cart</button>
-                                        </div>
+                                        {% csrf_token %}
+									<div class="add-to-cart">
+										<button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> add to cart</button>
+									</div>
                                     </form>
 								</div>
 							</div>

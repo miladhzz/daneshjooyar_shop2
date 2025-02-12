@@ -41,7 +41,7 @@ class DiscountCode(BaseModel):
         return self.name
 
     def get_discount(self, price):
-        if self.discount_code_value == DiscountType.FIXED:
+        if self.discount_code_type == DiscountType.FIXED:
             return max(price - self.discount_code_value, 0)
 
         percent = int(price * (self.discount_code_value / 100))

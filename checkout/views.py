@@ -75,7 +75,7 @@ class RemoveFromCart(View):
     def get(self, request, *args, **kwargs):
         product_id = kwargs.get('product_id')
         if Product.objects.filter(id=product_id).exists():
-            cart = Cart.get_cart(request)
+            cart = Cart.get_cart(self.request)
             cart.remove(str(product_id))
             return redirect(reverse('checkout:cart_detail'))
 

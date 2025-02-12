@@ -10,16 +10,16 @@ from .cart import SessionCart
 @receiver(user_logged_in)
 def sync_session_with_db(sender, request, user, **kwargs):
     cart = SessionCart(request)
-    user_id = user.id
 
     for item in cart:
         Cart.objects.get_or_create(
-            user_id=user_id,
+            user_id=user.id,
             product_id=item['product_id'],
             defaults={
                 'quantity': item['quantity']
             }
         )
+
 
 @receiver(post_save, sender=Product)
 def soft_delete_cart(sender, instance, created, **kwargs):
@@ -54,16 +54,6 @@ def soft_delete_cart(sender, instance, created, **kwargs):
                 order.delete()
 
 
-# @receiver(post_save, sender=Product)
-# def soft_delete_order_product(sender, instance, created, **kwargs):
-#     if not created:
-#         product: Product = instance
-#         if product.deleted:
-#             order_products = OrderProduct.objects.filter(product=product)
-#             for order_product in order_products:
-#                 order_product.delete()
-
-
 @receiver(post_save, sender=Order)
 def soft_delete_order_product(sender, instance, created, **kwargs):
     if not created:
@@ -72,16 +62,3 @@ def soft_delete_order_product(sender, instance, created, **kwargs):
             order_products = OrderProduct.objects.filter(order=order)
             for order_product in order_products:
                 order_product.delete()
-
-# @receiver(post_save, sender=User)
-# def soft_delete_order(sender, instance, created, **kwargs):
-#     if not created:
-#         user: User = instance
-#         if user.deleted:
-#             try:
-#                 Profile.objects.get(user=user).delete()
-#             except Profile.DoesNotExist:
-#                 pass
-#             orders = Order.objects.filter(user=user)
-#             for order in orders:
-#                 order.delete()

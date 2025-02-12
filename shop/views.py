@@ -1,5 +1,5 @@
 from .models import Product
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, TemplateView
 
 
 class Index(ListView):
@@ -26,3 +26,7 @@ class Store(ListView):
             return Product.objects.filter(category__title=category)
 
         return Product.objects.all()
+
+
+class About(TemplateView):
+    template_name = 'about.html'

@@ -1,13 +1,47 @@
 from . import models
-
-
 CART_SESSION_ID = 'cart'
+
+
+class DbCart:
+    def __init__(self, request):
+        self.user_id = request.user.id
+
+    @property
+    def get_total_price(self):
+        return sum(item.product.get_price * item.quantity for item in models.Cart.objects.filter(user_id=self.user_id))
+
+    def __iter__(self):
+        for item in models.Cart.objects.filter(user_id=self.user_id):
+            yield {
+                'product_id': item.product.id,
+                'quantity': item.quantity,
+                'price': item.product.get_price,
+                'product': item.product
+            }
+
+    def add(self, product_id, product_price, quantity, update):
+        cart_db, created = models.Cart.objects.get_or_create(
+            user_id=self.user_id,
+            product_id=product_id,
+            defaults={
+                'quantity': quantity
+            }
+        )
+
+        if not created:
+            cart_db.quantity = quantity if update else cart_db.quantity + quantity
+            cart_db.save()
+
+    def remove(self, product_id):
+        models.Cart.objects.filter(user_id=self.user_id, product_id=product_id).delete()
+
+    def clear(self):
+        models.Cart.objects.filter(user_id=self.user_id).delete()
 
 
 class SessionCart:
     def __init__(self, request):
         self.session = request.session
-        self.request = request
 
         cart = self.session.get(CART_SESSION_ID)
         if not cart:
@@ -57,44 +91,6 @@ class SessionCart:
     def clear(self):
         self.session[CART_SESSION_ID] = {}
         self.session.modified = True
-
-
-class DbCart:
-
-    def __init__(self, request):
-        self.user_id = request.user.id
-        self.total_price = 0
-
-    @property
-    def get_total_price(self):
-        return sum(item.product.get_price * item.quantity for item in models.Cart.objects.filter(user_id=self.user_id))
-
-    def __iter__(self):
-        for item in models.Cart.objects.filter(user_id=self.user_id):
-            yield {
-                'product_id': item.product.id,
-                'quantity': item.quantity,
-                'price': item.product.get_price,
-                'product': item.product
-            }
-
-    def add(self, product_id, product_price, quantity, update):
-        cart_db, created = models.Cart.objects.get_or_create(
-            user_id=self.user_id,
-            product_id=product_id,
-            defaults={
-                'quantity': quantity,
-            }
-        )
-        if not created:
-            cart_db.quantity = quantity if update else cart_db.quantity + quantity
-            cart_db.save()
-
-    def remove(self, product_id):
-        models.Cart.objects.filter(user_id=self.user_id, product_id=product_id).delete()
-
-    def clear(self):
-        models.Cart.objects.filter(user_id=self.user_id).delete()
 
 
 class Cart:

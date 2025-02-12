@@ -36,15 +36,16 @@ def get_discount(request, cart):
 
     result = {
         'total_price': order_price,
-        'total_discount': 0,
+        'discount_code': discount_code,
         'discount_id': None,
-        'discount_code': discount_code
+        'total_discount': 0
     }
+
     if not discount_code:
         return result
 
     try:
-        discount = DiscountCode.objects.get(code=discount_code)
+        discount = DiscountCode.objects.active().get(code=discount_code)
         result['discount_id'] = discount.id
         result['total_price'] = new_price = discount.get_discount(order_price)
         result['total_discount'] = order_price - new_price
