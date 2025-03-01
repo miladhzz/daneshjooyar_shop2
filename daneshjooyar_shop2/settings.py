@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'discount',
     'payment',
     'accounts',
+    'search',
 ]
 
 MIDDLEWARE = [
