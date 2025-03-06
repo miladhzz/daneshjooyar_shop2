@@ -37,10 +37,15 @@
 							<div class="checkbox-filter">
                                 {% for category in categories %}
 								<div class="input-checkbox">
-									<input type="checkbox" id="{{ category.title }}">
-									<label for="{{ category.title }}">
+									<input type="checkbox" 
+										   id="category-{{ category.title }}" 
+										   name="category" 
+										   value="{{ category.title }}"
+										   class="category-filter"
+										   {% if category.title == selected_category %}checked{% endif %}>
+									<label for="category-{{ category.title }}">
 										<span></span>
-                                        {{ category.title }}
+										{{ category.title }}
 										<small>({{ category.product_count }})</small>
 									</label>
 								</div>
@@ -276,5 +281,28 @@
 			</div>
 			<!-- /container -->
 		</div>
-		<!-- /SECTION -->
+		<!-- /SECTION -->		
 {% endblock content %}
+{% block scripts %}
+    <script>
+		$(document).ready(function() {
+			$('.category-filter').on('change', function() {
+				var searchParams = new URLSearchParams(window.location.search);
+				
+				if (this.checked) {
+					searchParams.set('category', this.value);
+				} else {
+					searchParams.delete('category');
+				}
+				
+				if (searchParams.has('q')) {
+					searchParams.set('q', searchParams.get('q'));
+				}
+				
+				searchParams.delete('page');
+				
+				window.location.href = window.location.pathname + '?' + searchParams.toString();
+			});
+		});
+	</script>
+{% endblock scripts %}
