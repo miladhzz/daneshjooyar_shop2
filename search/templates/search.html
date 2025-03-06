@@ -60,13 +60,13 @@
 							<div class="price-filter">
 								<div id="price-slider"></div>
 								<div class="input-number price-min">
-									<input id="price-min" type="number" value="{{ min_price|default:'1000' }}">
+									<input id="price-min" type="number">
 									<span class="qty-up">+</span>
 									<span class="qty-down">-</span>
 								</div>
 								<span>-</span>
 								<div class="input-number price-max">
-									<input id="price-max" type="number" value="{{ max_price|default:'100000' }}">
+									<input id="price-max" type="number">
 									<span class="qty-up">+</span>
 									<span class="qty-down">-</span>
 								</div>
@@ -305,77 +305,4 @@
 			});
 		});
 	</script>
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-    <script>
-    $(document).ready(function() {
-        // تنظیمات اولیه اسلایدر
-        $("#price-slider").slider({
-            range: true,
-            min: 1000,
-            max: 100000,
-            values: [
-                {{ min_price|default:'1000' }}, 
-                {{ max_price|default:'100000' }}
-            ],
-            slide: function(event, ui) {
-                $("#price-min").val(ui.values[0]);
-                $("#price-max").val(ui.values[1]);
-            },
-            stop: function(event, ui) {
-                applyPriceFilter(ui.values[0], ui.values[1]);
-            }
-        });
-
-        // تنظیم مقادیر اولیه input ها
-        $("#price-min").val($("#price-slider").slider("values", 0));
-        $("#price-max").val($("#price-slider").slider("values", 1));
-
-        // آپدیت اسلایدر وقتی input ها تغییر می‌کنند
-        $("#price-min, #price-max").on('change', function() {
-            var min = parseInt($("#price-min").val());
-            var max = parseInt($("#price-max").val());
-            
-            if (min >= 1000 && max <= 100000 && min <= max) {
-                $("#price-slider").slider("values", [min, max]);
-                applyPriceFilter(min, max);
-            }
-        });
-
-        // دکمه‌های + و -
-        $(".qty-up").click(function() {
-            var input = $(this).siblings('input');
-            var value = parseInt(input.val()) + 1000;
-            if (value <= 100000) {
-                input.val(value).trigger('change');
-            }
-        });
-
-        $(".qty-down").click(function() {
-            var input = $(this).siblings('input');
-            var value = parseInt(input.val()) - 1000;
-            if (value >= 1000) {
-                input.val(value).trigger('change');
-            }
-        });
-
-        function applyPriceFilter(min, max) {
-            var searchParams = new URLSearchParams(window.location.search);
-            
-            searchParams.set('min_price', min);
-            searchParams.set('max_price', max);
-            
-            // حفظ پارامترهای دیگر
-            if (searchParams.has('q')) {
-                searchParams.set('q', searchParams.get('q'));
-            }
-            if (searchParams.has('category')) {
-                searchParams.set('category', searchParams.get('category'));
-            }
-            
-            searchParams.delete('page');
-            window.location.href = window.location.pathname + '?' + searchParams.toString();
-        }
-    });
-    </script>
 {% endblock scripts %}
