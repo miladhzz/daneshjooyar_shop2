@@ -17,6 +17,7 @@ class SearchView(ListView):
         context['categories'] = Category.objects.annotate(
             product_count=Count('product')
         ).filter(product_count__gt=0)
+        context['search_query'] = self.request.GET.get('q', '')
         return context
 
     def get_queryset(self):
