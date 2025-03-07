@@ -132,6 +132,15 @@
 			range: {
 				'min': 1000,
 				'max': 100000
+			},
+			format: {
+				to: function (value) {
+					return value;
+				},
+
+				from: function (value) {
+					return value;
+				}
 			}
 		});
 
