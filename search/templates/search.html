@@ -299,6 +299,27 @@
 				
 				window.location.href = window.location.pathname + '?' + searchParams.toString();
 			});
+			
+			var priceSlider = document.getElementById('price-slider');
+			priceSlider.noUiSlider.on('end', function() {
+				var min = parseInt($("#price-min").val());
+				var max = parseInt($("#price-max").val());
+				
+				var searchParams = new URLSearchParams(window.location.search);
+				searchParams.set('min_price', min);
+				searchParams.set('max_price', max);
+				
+				if (searchParams.has('q')) {
+					searchParams.set('q', searchParams.get('q'));
+				}
+				if (searchParams.has('category')) {
+					searchParams.set('category', searchParams.get('category'));
+				}
+				
+				searchParams.delete('page');
+				
+				window.location.href = window.location.pathname + '?' + searchParams.toString();
+			});
 		});
 	</script>
 {% endblock scripts %}
