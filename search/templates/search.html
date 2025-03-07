@@ -300,7 +300,16 @@
 				window.location.href = window.location.pathname + '?' + searchParams.toString();
 			});
 			
+			
+
 			var priceSlider = document.getElementById('price-slider');
+			
+			var searchParams = new URLSearchParams(window.location.search);
+			var minPrice = parseInt(searchParams.get('min_price')) || 1000;
+			var maxPrice = parseInt(searchParams.get('max_price')) || 100000;
+			
+			priceSlider.noUiSlider.set([minPrice, maxPrice]);
+
 			priceSlider.noUiSlider.on('end', function() {
 				var min = parseInt($("#price-min").val());
 				var max = parseInt($("#price-max").val());
@@ -317,7 +326,6 @@
 				}
 				
 				searchParams.delete('page');
-				
 				window.location.href = window.location.pathname + '?' + searchParams.toString();
 			});
 		});
