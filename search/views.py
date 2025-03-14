@@ -1,10 +1,6 @@
 from django.views.generic import ListView
 from shop.models import Product, Category
-# این اضافه شد
 from django.db.models import Count
-from django.db.models import Q
-from django.urls import reverse
-
 
 
 class SearchView(ListView):  
