@@ -7,13 +7,12 @@ class SearchView(ListView):
     model = Product  
     template_name = 'search.html'  
     context_object_name = 'products'  
-    paginate_by = 3  
+    paginate_by = 3
 
     def get_context_data(self, **kwargs):  
         context = super().get_context_data(**kwargs)  
         context['categories'] = self.get_categories()  
-        context['current_params'] = self.get_current_params()  
-        context.update(self.get_search_parameters())  
+        context['current_params'] = self.get_current_params()
         return context  
 
     def get_categories(self):  
@@ -24,20 +23,12 @@ class SearchView(ListView):
     def get_current_params(self):  
         params = self.request.GET.copy()  
         params.pop('page', None)
-        return params  
-
-    def get_search_parameters(self):  
-        return {  
-            'search_query': self.request.GET.get('q', ''),  
-            'selected_category': self.request.GET.get('category', ''),  
-            'min_price': self.request.GET.get('min_price', ''),  
-            'max_price': self.request.GET.get('max_price', ''),  
-        }  
+        return params
 
     def get_queryset(self):  
         queryset = super().get_queryset()  
         filters = self.get_filters()  
-        return queryset.filter(**filters)  
+        return queryset.filter(**filters).order_by('title')
 
     def get_filters(self):  
         filters = {}  
