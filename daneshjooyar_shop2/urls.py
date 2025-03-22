@@ -18,6 +18,7 @@ urlpatterns = [
     path('discount/', include("discount.urls", namespace="discount")),
     path('payment/', include("payment.urls", namespace="payment")),
     path('accounts/', include("accounts.urls", namespace="accounts")),
+    path('search/', include("search.urls", namespace="search")),
     path(
       "sitemap.xml",
       views.index,

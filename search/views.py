@@ -1,3 +1,13 @@
-from django.shortcuts import render
+from django.views.generic import ListView
+from shop.models import Product
 
-# Create your views here.
+
+class SearchView(ListView):
+    model = Product
+    template_name = 'search.html'
+    context_object_name = 'products'
+    paginate_by = 3
+
+    def get_queryset(self):
+        query = self.request.GET.get('q', '')
+        return Product.objects.filter(title__icontains=query).order_by('title')
