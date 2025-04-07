@@ -10,8 +10,23 @@ class SearchView(ListView):
     paginate_by = 3
 
     def get_queryset(self):
-        query = self.request.GET.get('q', '')
-        return Product.objects.filter(title__icontains=query).order_by('title')
+        queryset = super().get_queryset()
+
+        q = self.request.GET.get('q', '')
+        category = self.request.GET.get('category', '')
+        min_price = self.request.GET.get('min_price', '')
+        max_price = self.request.GET.get('max_price', '')
+
+        if q:
+            queryset = queryset.filter(title__icontains=q).order_by('title')
+        if category:
+            queryset = queryset.filter(category__title=category).order_by('title')
+        if min_price:
+            queryset = queryset.filter(price__gte=min_price).order_by('title')
+        if max_price:
+            queryset = queryset.filter(price__lte=max_price).order_by('title')
+
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
