@@ -31,4 +31,10 @@ class SearchView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['categories'] = Category.objects.annotate(product_count=Count('product')).filter(product_count__gt=0)
+
+        params = self.request.GET.copy()
+        params.pop('page')
+        context['current_params'] = params
+
+        context['search_query'] = self.request.GET.get('q', '')
         return context

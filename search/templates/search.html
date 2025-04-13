@@ -250,19 +250,21 @@
 						<div class="store-filter clearfix">
 							<span class="store-qty">Showing 20-100 products</span>
 							<ul class="store-pagination">
-                                {% if page_obj.has_previous %}
-								    <li><a href="?page={{ page_obj.previous_page_number }}"><i class="fa fa-angle-left"></i></a></li>
-                                {% endif %}
-                                {% for num in page_obj.paginator.page_range %}
-                                    {% if page_obj.number == num %}
-                                        <li class="active">{{ num }}</li>
-                                    {% else %}
-                                        <li><a href="?page={{ num }}">{{ num }}</a></li>
+                                {% with params=current_params.urlencode %}
+                                    {% if page_obj.has_previous %}
+                                        <li><a href="?page={{ page_obj.previous_page_number }}&{{ params }}"><i class="fa fa-angle-left"></i></a></li>
                                     {% endif %}
-                                {% endfor %}
-                                {% if page_obj.has_next %}
-								    <li><a href="?page={{ page_obj.next_page_number }}"><i class="fa fa-angle-right"></i></a></li>
-                                {% endif %}
+                                    {% for num in page_obj.paginator.page_range %}
+                                        {% if page_obj.number == num %}
+                                            <li class="active">{{ num }}</li>
+                                        {% else %}
+                                            <li><a href="?page={{ num }}&{{ params }}">{{ num }}</a></li>
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% if page_obj.has_next %}
+                                        <li><a href="?page={{ page_obj.next_page_number }}&{{ params }}"><i class="fa fa-angle-right"></i></a></li>
+                                    {% endif %}
+                                {% endwith %}
 							</ul>
 						</div>
 						<!-- /store bottom filter -->
