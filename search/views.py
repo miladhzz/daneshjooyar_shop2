@@ -33,8 +33,11 @@ class SearchView(ListView):
         context['categories'] = Category.objects.annotate(product_count=Count('product')).filter(product_count__gt=0)
 
         params = self.request.GET.copy()
-        params.pop('page')
+        params.pop('page', None)
         context['current_params'] = params
 
         context['search_query'] = self.request.GET.get('q', '')
+        context['selected_category'] = self.request.GET.get('category', '')
+        context['min_price'] = self.request.GET.get('min_price', '')
+        context['max_price'] = self.request.GET.get('max_price', '')
         return context
