@@ -60,15 +60,11 @@
 							<div class="price-filter">
 								<div id="price-slider"></div>
 								<div class="input-number price-min">
-									<input id="price-min" type="number">
-									<span class="qty-up">+</span>
-									<span class="qty-down">-</span>
+									<input id="price-min" type="number" readonly>
 								</div>
 								<span>-</span>
 								<div class="input-number price-max">
-									<input id="price-max" type="number">
-									<span class="qty-up">+</span>
-									<span class="qty-down">-</span>
+									<input id="price-max" type="number" readonly>
 								</div>
 							</div>
 						</div>
@@ -302,6 +298,59 @@
 
             window.location.href = window.location.pathname + '?' + searchParams.toString();
         });
+
+        //-------------slider-----------
+
+        let priceInputMax = document.getElementById('price-max');
+        let priceInputMin = document.getElementById('price-min');
+
+        let priceSlider = document.getElementById('price-slider');
+        if (priceSlider) {
+            noUiSlider.create(priceSlider, {
+                start: [1000, 1000000],
+                connect: true,
+                step: 1000,
+                range: {
+                    'min': 1000,
+                    'max': 1000000
+                }
+            });
+
+            let searchParams = new URLSearchParams(window.location.search);
+            let minPrice = parseInt(searchParams.get('min_price')) || 1000;
+            let maxPrice = parseInt(searchParams.get('max_price')) || 1000000;
+
+            priceSlider.noUiSlider.set([minPrice, maxPrice]);
+
+            priceSlider.noUiSlider.on('update', function( values, handle ) {
+                var value = values[handle];
+                handle ? priceInputMax.value = value : priceInputMin.value = value;
+            });
+
+            priceSlider.noUiSlider.on('end', function( values, handle ) {
+
+                let min = parseInt($("#price-min").val());
+                let max = parseInt($("#price-max").val());
+
+                let searchParams = new URLSearchParams(window.location.search);
+                searchParams.set('min_price', min.toString());
+                searchParams.set('max_price', max.toString());
+
+                if (searchParams.has('q')){
+                    searchParams.set('q', searchParams.get('q'));
+                }
+
+                if (searchParams.has('category')){
+                    searchParams.set('category', searchParams.get('category'));
+                }
+
+                searchParams.delete('page');
+
+                window.location.href = window.location.pathname + '?' + searchParams.toString();
+            });
+        }
+
+        //-------------slider end-----------
     });
     </script>
 {% endblock scripts %}
