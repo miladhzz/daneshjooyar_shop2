@@ -104,11 +104,11 @@ class ActiveEmail(View):
             user_id = force_str(urlsafe_base64_decode(kwargs.get('encoded_user_id')))
             user = User.objects.get(id=user_id, is_active=False)
         except (ValueError, User.DoesNotExist):
-            logger.error(f"Email activation error: Invalid user")
+            logger.warning(f"Email activation error: Invalid user")
             return HttpResponse('<h1>Error, your request is invalid.</h1>')
 
         if not default_token_generator.check_token(user, kwargs.get('token')):
-            logger.error(f"Email activation error: Invalid token for user {user.username}")
+            logger.warning(f"Email activation error: Invalid token for user {user.username}")
             return HttpResponse('<h1>Error, your activation link is invalid.</h1>')
 
         user.is_active = True
