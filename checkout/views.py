@@ -11,6 +11,7 @@ from .cart import Cart
 from shop.models import Product
 from django.urls import reverse_lazy
 from django.http import Http404
+from core.logger import logger
 
 
 class Checkout(View):
@@ -32,19 +33,21 @@ class Checkout(View):
 
     def post(self, request, *args, **kwargs):
         cart = Cart.get_cart(request)
-
         different_address = request.POST.get('different_address')
 
         if different_address:
             order_form = OrderForm(request.POST)
             if not order_form.is_valid():
+                logger.warning(f"فرم سفارش نامعتبر برای کاربر {request.user.username}")
                 return render(request, "checkout.html")
+            
             order = save_order_different(cart, order_form, request)
+            logger.info(f"سفارش جدید با آدرس متفاوت ثبت شد - سفارش: {order.id} - کاربر: {request.user.username}")
             cart.clear()
             return redirect(reverse('payment:to_bank', args=[order.id]))
 
-        # not different_address:
         order = save_order_user(cart, request)
+        logger.info(f"سفارش جدید با آدرس کاربر ثبت شد - سفارش: {order.id} - کاربر: {request.user.username}")
         cart.clear()
         return redirect(reverse('payment:to_bank', args=[order.id]))
 
@@ -60,10 +63,10 @@ class AddToCart(FormView):
         update = True if form.cleaned_data['update'] == 1 else False
 
         product = get_object_or_404(Product, id=product_id)
-
         cart = Cart.get_cart(self.request)
         cart.add(product_id, product.get_price, quantity, update)
-
+        
+        logger.info(f"افزودن محصول به سبد خرید - محصول: {product.title} - تعداد: {quantity} - کاربر: {self.request.user.username}")
         return redirect(self.get_success_url())
 
 
@@ -75,8 +78,11 @@ class RemoveFromCart(View):
     def get(self, request, *args, **kwargs):
         product_id = kwargs.get('product_id')
         if Product.objects.filter(id=product_id).exists():
+            product = Product.objects.get(id=product_id)
             cart = Cart.get_cart(self.request)
             cart.remove(str(product_id))
+            logger.info(f"حذف محصول از سبد خرید - محصول: {product.title} - کاربر: {request.user.username}")
             return redirect(reverse('checkout:cart_detail'))
 
+        logger.warning(f"تلاش برای حذف محصول ناموجود - شناسه محصول: {product_id}")
         raise Http404('product is not found.')

@@ -14,6 +14,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.cache import cache
 from django.views import View
 from django.views.generic import FormView
+from core.logger import logger
 
 @login_required
 def edit_profile(request):
@@ -41,9 +42,11 @@ class LoginView(FormView):
 
         if user is not None:
             login(self.request, user)
+            logger.info(f"ورود موفق کاربر {username}")
             next_page = self.request.GET.get('next')
             return redirect(next_page if next_page else '/')
 
+        logger.warning(f"تلاش ناموفق برای ورود با نام کاربری {username}")
         messages.error(self.request, 'Invalid username or password', 'danger')
         return render(self.request, 'login.html', {'form': form})
 
@@ -66,6 +69,8 @@ class EmailLogin(FormView):
 
 
 def logout_view(request):
+    if request.user.is_authenticated:
+        logger.info(f"خروج کاربر {request.user.username}")
     logout(request)
     return redirect(reverse('shop:index'))
 
@@ -78,6 +83,7 @@ class Register(FormView):
         user = form.save(commit=False)
         user.is_active = False
         user.save()
+        logger.info(f"ثبت‌نام کاربر جدید: {user.username} با ایمیل {user.email}")
 
         current_site = get_current_site(self.request)
         token = default_token_generator.make_token(user)
@@ -86,6 +92,7 @@ class Register(FormView):
         activation_url = f'http://{current_site}{activation_path}'
 
         send_activation_code(activation_url, form.cleaned_data['email'])
+        logger.info(f"ایمیل فعال‌سازی برای کاربر {user.username} ارسال شد")
 
         messages.info(self.request, 'An activation email has been sent to you. Please verify your email.')
         return redirect('accounts:login')
@@ -97,13 +104,16 @@ class ActiveEmail(View):
             user_id = force_str(urlsafe_base64_decode(kwargs.get('encoded_user_id')))
             user = User.objects.get(id=user_id, is_active=False)
         except (ValueError, User.DoesNotExist):
+            logger.error(f"خطا در فعال‌سازی ایمیل: کاربر نامعتبر")
             return HttpResponse('<h1>Error, your request is invalid.</h1>')
 
         if not default_token_generator.check_token(user, kwargs.get('token')):
+            logger.error(f"خطا در فعال‌سازی ایمیل: توکن نامعتبر برای کاربر {user.username}")
             return HttpResponse('<h1>Error, your activation link is invalid.</h1>')
 
         user.is_active = True
         user.save()
+        logger.info(f"حساب کاربری {user.username} با موفقیت فعال شد")
         return HttpResponse('<h1>Your account has been activated.</h1>')
 
 
@@ -116,9 +126,11 @@ class MobileLogin(View):
         if mobile:
             request.session['mobile'] = mobile
             if cache.get(mobile):
+                logger.info(f"درخواست مجدد کد تایید برای شماره موبایل {mobile}")
                 return redirect(reverse('accounts:verify_otp'))
 
             send_otp(mobile)
+            logger.info(f"ارسال کد تایید برای شماره موبایل {mobile}")
             return redirect(reverse('accounts:verify_otp'))
 
 
@@ -137,19 +149,24 @@ class VerifyOtp(View):
         otp = request.POST.get('otp')
         cached_otp = cache.get(mobile)
         if cached_otp and str(cached_otp) == otp:
-            User.objects.get_or_create(
+            user, created = User.objects.get_or_create(
                 mobile=mobile,
                 defaults={
                     'username': mobile,
                     'email': f'{mobile}@mail.com'
                 }
             )
+            if created:
+                logger.info(f"کاربر جدید با شماره موبایل {mobile} ایجاد شد")
+            
             user = authenticate(mobile=mobile)
             if user is not None:
                 login(request, user)
+                logger.info(f"ورود موفق کاربر با شماره موبایل {mobile}")
                 cache.delete(mobile)
                 return redirect(reverse('shop:index'))
 
+        logger.warning(f"کد تایید نامعتبر برای شماره موبایل {mobile}")
         messages.error(request, 'Your otp is incorrect or yor user account is inactive', 'danger')
         return render(request, 'verify_otp.html')
 
