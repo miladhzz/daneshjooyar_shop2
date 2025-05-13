@@ -31,7 +31,7 @@ def get_special_price(product):
 
         return max_special
     except Exception as e:
-        logger.error(f"خطا در محاسبه قیمت ویژه برای محصول {product.title}: {str(e)}")
+        logger.error(f"Error calculating special price for product {product.title}: {str(e)}")
         return {
             'fixed_type': None,
             'fixed': None,
@@ -61,15 +61,15 @@ def get_discount(request, cart):
             result['total_price'] = new_price = discount.get_discount(order_price)
             result['total_discount'] = order_price - new_price
             
-            logger.info(f"اعمال کد تخفیف موفق - کد: {discount_code} - تخفیف: {result['total_discount']} - قیمت نهایی: {new_price}")
+            logger.info(f"Discount code successfully applied - Code: {discount_code} - Discount: {result['total_discount']} - Final price: {new_price}")
         except DiscountCode.DoesNotExist:
-            logger.warning(f"کد تخفیف نامعتبر: {discount_code}")
+            logger.warning(f"Invalid discount code: {discount_code}")
         except Exception as e:
-            logger.error(f"خطا در اعمال کد تخفیف {discount_code}: {str(e)}")
+            logger.error(f"Error applying discount code {discount_code}: {str(e)}")
 
         return result
     except Exception as e:
-        logger.error(f"خطای کلی در محاسبه تخفیف: {str(e)}")
+        logger.error(f"General error in discount calculation: {str(e)}")
         return {
             'total_price': order_price,
             'discount_code': discount_code,

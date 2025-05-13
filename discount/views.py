@@ -18,13 +18,13 @@ def apply_discount(request):
             new_price = discount.get_discount(order_price)
             total_discount = order_price - new_price
             
-            logger.info(f"کد تخفیف اعمال شد - کد: {discount_code} - تخفیف: {total_discount} - قیمت نهایی: {new_price}")
+            logger.info(f"Discount code applied - Code: {discount_code} - Discount: {total_discount} - Final price: {new_price}")
         except DiscountCode.DoesNotExist:
-            logger.warning(f"کد تخفیف نامعتبر: {discount_code}")
+            logger.warning(f"Invalid discount code: {discount_code}")
         except Exception as e:
-            logger.error(f"خطا در اعمال کد تخفیف {discount_code}: {str(e)}")
+            logger.error(f"Error applying discount code {discount_code}: {str(e)}")
 
         return JsonResponse({'new_price': new_price, 'total_discount': total_discount})
     except Exception as e:
-        logger.error(f"خطای کلی در اعمال تخفیف: {str(e)}")
+        logger.error(f"General error in applying discount: {str(e)}")
         return JsonResponse({'new_price': order_price, 'total_discount': 0})

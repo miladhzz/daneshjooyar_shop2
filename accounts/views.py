@@ -42,11 +42,11 @@ class LoginView(FormView):
 
         if user is not None:
             login(self.request, user)
-            logger.info(f"ورود موفق کاربر {username}")
+            logger.info(f"Successful login for user {username}")
             next_page = self.request.GET.get('next')
             return redirect(next_page if next_page else '/')
 
-        logger.warning(f"تلاش ناموفق برای ورود با نام کاربری {username}")
+        logger.warning(f"Failed login attempt for username {username}")
         messages.error(self.request, 'Invalid username or password', 'danger')
         return render(self.request, 'login.html', {'form': form})
 
@@ -70,7 +70,7 @@ class EmailLogin(FormView):
 
 def logout_view(request):
     if request.user.is_authenticated:
-        logger.info(f"خروج کاربر {request.user.username}")
+        logger.info(f"User {request.user.username} logged out")
     logout(request)
     return redirect(reverse('shop:index'))
 
@@ -83,7 +83,7 @@ class Register(FormView):
         user = form.save(commit=False)
         user.is_active = False
         user.save()
-        logger.info(f"ثبت‌نام کاربر جدید: {user.username} با ایمیل {user.email}")
+        logger.info(f"New user registration: {user.username} with email {user.email}")
 
         current_site = get_current_site(self.request)
         token = default_token_generator.make_token(user)
@@ -92,7 +92,7 @@ class Register(FormView):
         activation_url = f'http://{current_site}{activation_path}'
 
         send_activation_code(activation_url, form.cleaned_data['email'])
-        logger.info(f"ایمیل فعال‌سازی برای کاربر {user.username} ارسال شد")
+        logger.info(f"Activation email sent to user {user.username}")
 
         messages.info(self.request, 'An activation email has been sent to you. Please verify your email.')
         return redirect('accounts:login')
@@ -104,16 +104,16 @@ class ActiveEmail(View):
             user_id = force_str(urlsafe_base64_decode(kwargs.get('encoded_user_id')))
             user = User.objects.get(id=user_id, is_active=False)
         except (ValueError, User.DoesNotExist):
-            logger.error(f"خطا در فعال‌سازی ایمیل: کاربر نامعتبر")
+            logger.error(f"Email activation error: Invalid user")
             return HttpResponse('<h1>Error, your request is invalid.</h1>')
 
         if not default_token_generator.check_token(user, kwargs.get('token')):
-            logger.error(f"خطا در فعال‌سازی ایمیل: توکن نامعتبر برای کاربر {user.username}")
+            logger.error(f"Email activation error: Invalid token for user {user.username}")
             return HttpResponse('<h1>Error, your activation link is invalid.</h1>')
 
         user.is_active = True
         user.save()
-        logger.info(f"حساب کاربری {user.username} با موفقیت فعال شد")
+        logger.info(f"User account {user.username} successfully activated")
         return HttpResponse('<h1>Your account has been activated.</h1>')
 
 
@@ -126,11 +126,11 @@ class MobileLogin(View):
         if mobile:
             request.session['mobile'] = mobile
             if cache.get(mobile):
-                logger.info(f"درخواست مجدد کد تایید برای شماره موبایل {mobile}")
+                logger.info(f"Request for resending verification code for mobile number {mobile}")
                 return redirect(reverse('accounts:verify_otp'))
 
             send_otp(mobile)
-            logger.info(f"ارسال کد تایید برای شماره موبایل {mobile}")
+            logger.info(f"Verification code sent to mobile number {mobile}")
             return redirect(reverse('accounts:verify_otp'))
 
 
@@ -157,16 +157,16 @@ class VerifyOtp(View):
                 }
             )
             if created:
-                logger.info(f"کاربر جدید با شماره موبایل {mobile} ایجاد شد")
+                logger.info(f"New user created with mobile number {mobile}")
             
             user = authenticate(mobile=mobile)
             if user is not None:
                 login(request, user)
-                logger.info(f"ورود موفق کاربر با شماره موبایل {mobile}")
+                logger.info(f"Successful login for user with mobile number {mobile}")
                 cache.delete(mobile)
                 return redirect(reverse('shop:index'))
 
-        logger.warning(f"کد تایید نامعتبر برای شماره موبایل {mobile}")
+        logger.warning(f"Invalid verification code for mobile number {mobile}")
         messages.error(request, 'Your otp is incorrect or yor user account is inactive', 'danger')
         return render(request, 'verify_otp.html')
 

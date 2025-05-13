@@ -20,11 +20,11 @@ class SearchView(ListView):
             min_price = self.request.GET.get('min_price', '')
             max_price = self.request.GET.get('max_price', '')
 
-            # لاگ کردن پارامترهای جستجو
+            # Logging search parameters
             logger.info(
-                f"درخواست جستجو - کاربر: {self.request.user.username if self.request.user.is_authenticated else 'مهمان'} - "
-                f"عبارت: {q} - دسته‌بندی: {category} - "
-                f"حداقل قیمت: {min_price} - حداکثر قیمت: {max_price}"
+                f"Search request - User: {self.request.user.username if self.request.user.is_authenticated else 'Guest'} - "
+                f"Query: {q} - Category: {category} - "
+                f"Min price: {min_price} - Max price: {max_price}"
             )
 
             if q:
@@ -39,7 +39,7 @@ class SearchView(ListView):
             return queryset
 
         except Exception as e:
-            logger.error(f"خطا در جستجو: {str(e)}")
+            logger.error(f"Error in search: {str(e)}")
             return Product.objects.none()
 
     def get_context_data(self, **kwargs):
@@ -58,5 +58,5 @@ class SearchView(ListView):
             
             return context
         except Exception as e:
-            logger.error(f"خطا در آماده‌سازی داده‌های جستجو: {str(e)}")
+            logger.error(f"Error in preparing search data: {str(e)}")
             return {}
