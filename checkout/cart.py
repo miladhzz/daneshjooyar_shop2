@@ -1,5 +1,5 @@
 from . import models
-from core.logger import logger
+import logging
 
 CART_SESSION_ID = 'cart'
 
@@ -79,12 +79,12 @@ class SessionCart:
         else:
             self.cart[product_id]['quantity'] += quantity
 
-        logger.info(f"Added to cart - Product: {product_id} - Quantity: {quantity} - Price: {product_price}")
+        logging.info(f"Added to cart - Product: {product_id} - Quantity: {quantity} - Price: {product_price}")
         self.__save()
 
     def remove(self, product_id):
         if product_id in self.cart:
-            logger.info(f"Removed from cart - Product: {product_id}")
+            logging.info(f"Removed from cart - Product: {product_id}")
             del self.cart[product_id]
             self.__save()
 
@@ -93,7 +93,7 @@ class SessionCart:
         self.session.modified = True
 
     def clear(self):
-        logger.info("Cart cleared")
+        logging.info("Cart cleared")
         self.session[CART_SESSION_ID] = {}
         self.session.modified = True
 

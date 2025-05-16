@@ -165,3 +165,40 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 SITE_ID = 1
+
+import logging
+import os
+from datetime import datetime
+
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+        "file": {
+            "class": "logging.FileHandler",
+            "filename": f'logs/shop_{datetime.now().strftime("%Y-%m-%d")}.log',
+        },
+    },
+    "root": {
+        "handlers": ["console", "file"],
+        "level": "INFO",
+    },
+}
+
+import sentry_sdk
+from sentry_sdk.integrations.logging import LoggingIntegration
+
+sentry_sdk.init(
+        dsn="https://c26ba68707939b61d5c391306ccea151@o4509325588430848.ingest.de.sentry.io/4509325592887376",
+        send_default_pii=True,
+        integrations=[
+            LoggingIntegration(
+                level=logging.INFO,
+                event_level=logging.INFO
+            ),
+        ],
+    )

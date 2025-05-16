@@ -11,7 +11,7 @@ from .cart import Cart
 from shop.models import Product
 from django.urls import reverse_lazy
 from django.http import Http404
-from core.logger import logger
+import logging
 
 
 class Checkout(View):
@@ -38,16 +38,16 @@ class Checkout(View):
         if different_address:
             order_form = OrderForm(request.POST)
             if not order_form.is_valid():
-                logger.warning(f"Invalid order form for user {request.user.username}")
+                logging.warning(f"Invalid order form for user {request.user.username}")
                 return render(request, "checkout.html")
             
             order = save_order_different(cart, order_form, request)
-            logger.info(f"New order with different address registered - Order: {order.id} - User: {request.user.username}")
+            logging.info(f"New order with different address registered - Order: {order.id} - User: {request.user.username}")
             cart.clear()
             return redirect(reverse('payment:to_bank', args=[order.id]))
 
         order = save_order_user(cart, request)
-        logger.info(f"New order with user address registered - Order: {order.id} - User: {request.user.username}")
+        logging.info(f"New order with user address registered - Order: {order.id} - User: {request.user.username}")
         cart.clear()
         return redirect(reverse('payment:to_bank', args=[order.id]))
 
@@ -66,7 +66,7 @@ class AddToCart(FormView):
         cart = Cart.get_cart(self.request)
         cart.add(product_id, product.get_price, quantity, update)
         
-        logger.info(f"Product added to cart - Product: {product.title} - Quantity: {quantity} - User: {self.request.user.username}")
+        logging.info(f"Product added to cart - Product: {product.title} - Quantity: {quantity} - User: {self.request.user.username}")
         return redirect(self.get_success_url())
 
 
@@ -81,8 +81,8 @@ class RemoveFromCart(View):
             product = Product.objects.get(id=product_id)
             cart = Cart.get_cart(self.request)
             cart.remove(str(product_id))
-            logger.info(f"Product removed from cart - Product: {product.title} - User: {request.user.username}")
+            logging.info(f"Product removed from cart - Product: {product.title} - User: {request.user.username}")
             return redirect(reverse('checkout:cart_detail'))
 
-        logger.warning(f"Attempt to remove non-existent product - Product ID: {product_id}")
+        logging.warning(f"Attempt to remove non-existent product - Product ID: {product_id}")
         raise Http404('product is not found.')

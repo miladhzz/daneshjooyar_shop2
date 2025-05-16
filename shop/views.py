@@ -1,6 +1,6 @@
 from .models import Product
 from django.views.generic import ListView, DetailView, TemplateView
-from core.logger import logger
+import logging
 
 
 class Index(ListView):
@@ -17,7 +17,7 @@ class Detail(DetailView):
 
     def get_object(self, queryset=None):
         obj = super().get_object(queryset)
-        logger.info(f"Viewing product details: {obj.title}")
+        logging.info(f"Viewing product details: {obj.title}")
         return obj
 
 
@@ -28,7 +28,7 @@ class Store(ListView):
     def get_queryset(self):
         category = self.request.GET.get('category')
         if category:
-            logger.info(f"Viewing products in category: {category}")
+            logging.info(f"Viewing products in category: {category}")
             return Product.objects.filter(category__title=category)
         return Product.objects.all()
 

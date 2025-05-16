@@ -1,7 +1,7 @@
 from django.views.generic import ListView
 from shop.models import Product, Category
 from django.db.models import Count
-from core.logger import logger
+import logging
 from django.utils import timezone
 
 
@@ -21,7 +21,7 @@ class SearchView(ListView):
             max_price = self.request.GET.get('max_price', '')
 
             # Logging search parameters
-            logger.info(
+            logging.info(
                 f"Search request - User: {self.request.user.username if self.request.user.is_authenticated else 'Guest'} - "
                 f"Query: {q} - Category: {category} - "
                 f"Min price: {min_price} - Max price: {max_price}"
@@ -39,7 +39,7 @@ class SearchView(ListView):
             return queryset
 
         except Exception as e:
-            logger.error(f"Error in search: {str(e)}")
+            logging.error(f"Error in search: {str(e)}")
             return Product.objects.none()
 
     def get_context_data(self, **kwargs):
@@ -58,5 +58,5 @@ class SearchView(ListView):
             
             return context
         except Exception as e:
-            logger.error(f"Error in preparing search data: {str(e)}")
+            logging.error(f"Error in preparing search data: {str(e)}")
             return {}
