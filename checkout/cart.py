@@ -79,12 +79,10 @@ class SessionCart:
         else:
             self.cart[product_id]['quantity'] += quantity
 
-        logging.info(f"Added to cart - Product: {product_id} - Quantity: {quantity} - Price: {product_price}")
         self.__save()
 
     def remove(self, product_id):
         if product_id in self.cart:
-            logging.info(f"Removed from cart - Product: {product_id}")
             del self.cart[product_id]
             self.__save()
 

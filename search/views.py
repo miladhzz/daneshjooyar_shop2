@@ -2,7 +2,6 @@ from django.views.generic import ListView
 from shop.models import Product, Category
 from django.db.models import Count
 import logging
-from django.utils import timezone
 
 
 class SearchView(ListView):
