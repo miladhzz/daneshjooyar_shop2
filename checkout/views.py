@@ -33,19 +33,21 @@ class Checkout(View):
 
     def post(self, request, *args, **kwargs):
         cart = Cart.get_cart(request)
-
         different_address = request.POST.get('different_address')
 
         if different_address:
             order_form = OrderForm(request.POST)
             if not order_form.is_valid():
+                logging.warning(f"Invalid order form for user {request.user.username}")
                 return render(request, "checkout.html")
+            
             order = save_order_different(cart, order_form, request)
+            logging.info(f"New order with different address registered - Order: {order.id} - User: {request.user.username}")
             cart.clear()
             return redirect(reverse('payment:to_bank', args=[order.id]))
 
-        # not different_address:
         order = save_order_user(cart, request)
+        logging.info(f"New order with user address registered - Order: {order.id} - User: {request.user.username}")
         cart.clear()
         return redirect(reverse('payment:to_bank', args=[order.id]))
 
@@ -61,11 +63,10 @@ class AddToCart(FormView):
         update = True if form.cleaned_data['update'] == 1 else False
 
         product = get_object_or_404(Product, id=product_id)
-
         cart = Cart.get_cart(self.request)
         cart.add(product_id, product.get_price, quantity, update)
-        logging.info(f'{product_id} added to cart info')
-
+        
+        logging.info(f"Product added to cart - Product: {product.title} - Quantity: {quantity} - User: {self.request.user.username}")
         return redirect(self.get_success_url())
 
 
@@ -77,8 +78,11 @@ class RemoveFromCart(View):
     def get(self, request, *args, **kwargs):
         product_id = kwargs.get('product_id')
         if Product.objects.filter(id=product_id).exists():
+            product = Product.objects.get(id=product_id)
             cart = Cart.get_cart(self.request)
             cart.remove(str(product_id))
+            logging.info(f"Product removed from cart - Product: {product.title} - User: {request.user.username}")
             return redirect(reverse('checkout:cart_detail'))
 
+        logging.warning(f"Attempt to remove non-existent product - Product ID: {product_id}")
         raise Http404('product is not found.')

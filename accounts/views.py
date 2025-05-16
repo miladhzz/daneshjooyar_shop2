@@ -16,6 +16,7 @@ from django.views import View
 from django.views.generic import FormView
 import logging
 
+
 @login_required
 def edit_profile(request):
     return HttpResponse('<h1>Edit Profile</h1>')
@@ -25,7 +26,6 @@ def edit_profile(request):
 def get_cities(request):
     province_id = request.GET.get('province_id')
     if not province_id:
-        logging.warning(f'province id: province_id is not valid!')
         return JsonResponse({'error': 'province id is not valid!'}, status=400)
 
     cities = City.objects.filter(province_id=province_id).values('id', 'title')
@@ -43,12 +43,12 @@ class LoginView(FormView):
 
         if user is not None:
             login(self.request, user)
-            logging.info(f'Successful login user: {username}')
+            logging.info(f"Successful login for user {username}")
             next_page = self.request.GET.get('next')
             return redirect(next_page if next_page else '/')
 
+        logging.warning(f"Failed login attempt for username {username}")
         messages.error(self.request, 'Invalid username or password', 'danger')
-        logging.info(f'Invalid username or password user: {username}')
         return render(self.request, 'login.html', {'form': form})
 
 
@@ -70,6 +70,8 @@ class EmailLogin(FormView):
 
 
 def logout_view(request):
+    if request.user.is_authenticated:
+        logging.info(f"User {request.user.username} logged out")
     logout(request)
     return redirect(reverse('shop:index'))
 
@@ -82,6 +84,7 @@ class Register(FormView):
         user = form.save(commit=False)
         user.is_active = False
         user.save()
+        logging.info(f"New user registration: {user.username} with email {user.email}")
 
         current_site = get_current_site(self.request)
         token = default_token_generator.make_token(user)
@@ -90,6 +93,7 @@ class Register(FormView):
         activation_url = f'http://{current_site}{activation_path}'
 
         send_activation_code(activation_url, form.cleaned_data['email'])
+        logging.info(f"Activation email sent to user {user.username}")
 
         messages.info(self.request, 'An activation email has been sent to you. Please verify your email.')
         return redirect('accounts:login')
@@ -101,13 +105,16 @@ class ActiveEmail(View):
             user_id = force_str(urlsafe_base64_decode(kwargs.get('encoded_user_id')))
             user = User.objects.get(id=user_id, is_active=False)
         except (ValueError, User.DoesNotExist):
+            logging.warning(f"Email activation error: Invalid user")
             return HttpResponse('<h1>Error, your request is invalid.</h1>')
 
         if not default_token_generator.check_token(user, kwargs.get('token')):
+            logging.warning(f"Email activation error: Invalid token for user {user.username}")
             return HttpResponse('<h1>Error, your activation link is invalid.</h1>')
 
         user.is_active = True
         user.save()
+        logging.info(f"User account {user.username} successfully activated")
         return HttpResponse('<h1>Your account has been activated.</h1>')
 
 
@@ -120,9 +127,11 @@ class MobileLogin(View):
         if mobile:
             request.session['mobile'] = mobile
             if cache.get(mobile):
+                logging.info(f"Request for resending verification code for mobile number {mobile}")
                 return redirect(reverse('accounts:verify_otp'))
 
             send_otp(mobile)
+            logging.info(f"Verification code sent to mobile number {mobile}")
             return redirect(reverse('accounts:verify_otp'))
 
 
@@ -141,19 +150,24 @@ class VerifyOtp(View):
         otp = request.POST.get('otp')
         cached_otp = cache.get(mobile)
         if cached_otp and str(cached_otp) == otp:
-            User.objects.get_or_create(
+            user, created = User.objects.get_or_create(
                 mobile=mobile,
                 defaults={
                     'username': mobile,
                     'email': f'{mobile}@mail.com'
                 }
             )
+            if created:
+                logging.info(f"New user created with mobile number {mobile}")
+            
             user = authenticate(mobile=mobile)
             if user is not None:
                 login(request, user)
+                logging.info(f"Successful login for user with mobile number {mobile}")
                 cache.delete(mobile)
                 return redirect(reverse('shop:index'))
 
+        logging.warning(f"Invalid verification code for mobile number {mobile}")
         messages.error(request, 'Your otp is incorrect or yor user account is inactive', 'danger')
         return render(request, 'verify_otp.html')
 

@@ -7,6 +7,7 @@ from django.views import View
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from core import OrderStatus
+import logging
 
 
 @method_decorator(login_required, name='dispatch')
@@ -14,6 +15,8 @@ class ToBank(View):
     def get(self, request, *args, **kwargs):
         order_id = kwargs.get('order_id')
         order = get_object_or_404(Order, id=order_id, user_id=request.user.id, status=OrderStatus.PENDING_PAYMENT)
+        logging.info(f"Starting payment process - Order: {order.id} - User: {request.user.username}")
+
         data = {
             "merchant_id": settings.ZARINPAL_MERCHANT_ID,
             "amount": order.total_price,
@@ -26,21 +29,25 @@ class ToBank(View):
         try:
             response = requests.post(settings.ZARINPAL_REQUEST, data=data, headers=headers, timeout=10)
         except requests.exceptions.Timeout:
+            logging.error(f"Timeout error in payment - Order: {order.id}")
             order.status = OrderStatus.FAILED
             order.save()
             return render(request, 'to_bank.html', {'error': 'time out error'})
         except requests.exceptions.ConnectionError:
+            logging.error(f"Connection error in payment - Order: {order.id}")
             order.status = OrderStatus.FAILED
             order.save()
             return render(request, 'to_bank.html', {'error': 'connection error'})
 
         if response.status_code != 200:
+            logging.error(f"Status code error in payment - Order: {order.id} - Code: {response.status_code}")
             order.status = OrderStatus.FAILED
             order.save()
             return render(request, 'to_bank.html', {'error': f'response status code: {response.status_code}'})
 
         response = response.json()
         if response['data']['code'] != 100:
+            logging.error(f"Zarinpal status code error - Order: {order.id} - Code: {response['data']['code']}")
             order.status = OrderStatus.FAILED
             order.save()
             return render(request, 'to_bank.html', {'error': f'status error code: {response["data"]["code"]}'})
@@ -49,6 +56,7 @@ class ToBank(View):
         order.zarinpal_authority = authority
         order.status = OrderStatus.PENDING_PAYMENT
         order.save()
+        logging.info(f"Redirecting to payment gateway - Order: {order.id} - User: {request.user.username}")
         return redirect(settings.ZARINPAL_STARTPAY + authority)
 
 
@@ -58,8 +66,10 @@ class Verify(View):
         status = request.GET.get('Status')
 
         order = get_object_or_404(Order, zarinpal_authority=authority)
+        logging.info(f"Payment verification - Order: {order.id} - Status: {status}")
 
         if not status or status != 'OK':
+            logging.warning(f"Unsuccessful payment - Order: {order.id}")
             order.status = OrderStatus.FAILED
             order.save()
             return render(request, 'verify.html')
@@ -75,21 +85,25 @@ class Verify(View):
         try:
             response = requests.post(settings.ZARINPAL_VERIFY, data=data, headers=headers, timeout=10)
         except requests.exceptions.Timeout:
+            logging.error(f"Timeout error in payment verification - Order: {order.id}")
             order.status = OrderStatus.FAILED
             order.save()
             return render(request, 'verify.html', {'error': 'time out error'})
         except requests.exceptions.ConnectionError:
+            logging.error(f"Connection error in payment verification - Order: {order.id}")
             order.status = OrderStatus.FAILED
             order.save()
             return render(request, 'verify.html', {'error': 'connection error'})
 
         if response.status_code != 200:
+            logging.error(f"Status code error in payment verification - Order: {order.id} - Code: {response.status_code}")
             order.status = OrderStatus.FAILED
             order.save()
             return render(request, 'verify.html', {'error': f'response status code: {response.status_code}'})
 
         response = response.json()
         if response['data']['code'] != 100:
+            logging.error(f"Zarinpal status code error in verification - Order: {order.id} - Code: {response['data']['code']}")
             order.status = OrderStatus.FAILED
             order.save()
             return render(request, 'verify.html', {'error': f'status error code: {response["data"]["code"]}'})
@@ -98,4 +112,5 @@ class Verify(View):
         order.zarinpal_ref_id = ref_id
         order.status = OrderStatus.PROCESSING
         order.save()
+        logging.info(f"Successful payment - Order: {order.id} - Tracking code: {ref_id}")
         return render(request, 'verify.html', {'ref_id': ref_id})
