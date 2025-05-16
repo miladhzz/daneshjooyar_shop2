@@ -14,6 +14,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.cache import cache
 from django.views import View
 from django.views.generic import FormView
+import logging
 
 @login_required
 def edit_profile(request):
@@ -24,6 +25,7 @@ def edit_profile(request):
 def get_cities(request):
     province_id = request.GET.get('province_id')
     if not province_id:
+        logging.warning(f'province id: province_id is not valid!')
         return JsonResponse({'error': 'province id is not valid!'}, status=400)
 
     cities = City.objects.filter(province_id=province_id).values('id', 'title')
@@ -41,10 +43,12 @@ class LoginView(FormView):
 
         if user is not None:
             login(self.request, user)
+            logging.info(f'Successful login user: {username}')
             next_page = self.request.GET.get('next')
             return redirect(next_page if next_page else '/')
 
         messages.error(self.request, 'Invalid username or password', 'danger')
+        logging.info(f'Invalid username or password user: {username}')
         return render(self.request, 'login.html', {'form': form})
 
 

@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from .models import DiscountCode
+import logging
 
 
 @login_required
@@ -16,6 +17,7 @@ def apply_discount(request):
         new_price = discount.get_discount(order_price)
         total_discount = order_price - new_price
     except DiscountCode.DoesNotExist:
+        logging.warning(f'Invalid discount code: {discount_code}')
         pass
 
     return JsonResponse({'new_price': new_price, 'total_discount': total_discount})

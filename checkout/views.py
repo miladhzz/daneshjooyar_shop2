@@ -11,6 +11,7 @@ from .cart import Cart
 from shop.models import Product
 from django.urls import reverse_lazy
 from django.http import Http404
+import logging
 
 
 class Checkout(View):
@@ -63,6 +64,7 @@ class AddToCart(FormView):
 
         cart = Cart.get_cart(self.request)
         cart.add(product_id, product.get_price, quantity, update)
+        logging.info(f'{product_id} added to cart info')
 
         return redirect(self.get_success_url())
 

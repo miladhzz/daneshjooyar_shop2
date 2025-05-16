@@ -1,4 +1,5 @@
 from . import models
+import logging
 CART_SESSION_ID = 'cart'
 
 
@@ -77,11 +78,13 @@ class SessionCart:
         else:
             self.cart[product_id]['quantity'] += quantity
 
+        logging.info(f'Added to cart - product: {product_id}, quantity: {quantity}, price: {product_price} ')
         self.__save()
 
     def remove(self, product_id):
         if product_id in self.cart:
             del self.cart[product_id]
+            logging.info(f'Remove form cart - product: {product_id}')
             self.__save()
 
     def __save(self):
